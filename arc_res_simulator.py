@@ -316,8 +316,10 @@ class ResultsRenderer:
         """按 CSD 树顺序绘制（最终状态：所有 FadeIn 完成，alpha 视为 255）。"""
         name = node["name"]
         t = node["type"]
-        # beyond_result_node 在 CSD 里默认 Visible=False，仅 BEYOND 结算时由游戏运行时打开
-        if not node.get("visible", True) and not (name == "beyond_result_node" and self.opts.beyond):
+        # beyond_result_node / beyond_next_button 在 CSD 里默认 Visible=False，
+        # 仅 BEYOND 结算时由游戏运行时打开（此处用 --beyond 强制显示）
+        beyond_forced = self.opts.beyond and name in ("beyond_result_node", "beyond_next_button")
+        if not node.get("visible", True) and not beyond_forced:
             return
 
         # ---- 特殊节点（setupResultUI 逻辑）----
