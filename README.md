@@ -34,8 +34,8 @@ ArcResSimulator/
 python3 convert_layouts.py [csb2csd目录] [Assets6目录]
 ```
 
-- 默认 csb2csd：`/Users/wangjingkai/Documents/GitHub/csb2csd`
-- 默认 Assets6：`/Users/wangjingkai/Desktop/Arcaea/Assets/Assets6`
+- 默认 csb2csd：`/Users/啊啊啊啊啊啊啊我是钩子/Documents/GitHub/csb2csd`
+- 默认 Assets6：`/Users/啊啊啊啊啊啊啊我是钩子/Desktop/Arcaea/Assets/Assets6`
 
 三个结算 CSB 的加载点（IDA 逆向确认）：
 - `GameResultScene::init` → `layouts/results/Results.csb`
