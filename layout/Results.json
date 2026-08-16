@@ -1,0 +1,3436 @@
+{
+ "name": "Layer",
+ "ctype": "GameNodeObjectData",
+ "type": "Layer",
+ "action_tag": 0,
+ "visible": true,
+ "alpha": 255.0,
+ "rotation": [
+  0.0,
+  0.0
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "anchor": [
+  0.0,
+  0.0
+ ],
+ "scale": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  1280.0,
+  720.0
+ ],
+ "color": [
+  255,
+  255,
+  255,
+  255
+ ],
+ "flip": [
+  false,
+  false
+ ],
+ "touch_enable": false,
+ "children": [
+  {
+   "name": "back",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": -1651788144,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    720.0
+   ],
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    1920.0,
+    1440.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/results_bg.png"
+  },
+  {
+   "name": "back_bar",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": 818435103,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    347.441315
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.667,
+    0.667
+   ],
+   "size": [
+    1920.0,
+    944.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/res_banner.png"
+  },
+  {
+   "name": "songArtistLabel-fullnolocalize",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1128810289,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    639.999817,
+    572.352722
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    132.0,
+    42.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 28.0,
+   "text": "REDSHiFT",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    2.0,
+    -3.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    20,
+    20,
+    20,
+    255
+   ]
+  },
+  {
+   "name": "songNameLabel-fullnolocalize",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 568550332,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.000122,
+    616.51709
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    421.0,
+    71.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 48.0,
+   "text": "Sayonara Hatsukoi",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    3.0,
+    -3.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    20,
+    20,
+    20,
+    255
+   ]
+  },
+  {
+   "name": "character",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": -1606435056,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    750.0,
+    670.031982
+   ],
+   "anchor": [
+    0.0,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    1200.0,
+    920.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "startup/1080/char_h.png"
+  },
+  {
+   "name": "beyond_result_node",
+   "ctype": "SingleNodeObjectData",
+   "type": "Node",
+   "action_tag": -735994973,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [
+    {
+     "name": "res_scoresection_beyond_4",
+     "ctype": "SpriteObjectData",
+     "type": "Sprite",
+     "action_tag": -985466469,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      649.000122,
+      324.5
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      0.67,
+      0.67
+     ],
+     "size": [
+      776.0,
+      431.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "file": "layouts/results/res_scoresection_beyond.png"
+    },
+    {
+     "name": "beyond_cool_line",
+     "ctype": "SpriteObjectData",
+     "type": "Sprite",
+     "action_tag": 67197689,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      630.0,
+      452.850006
+     ],
+     "anchor": [
+      0.5,
+      1.0
+     ],
+     "scale": [
+      0.67,
+      0.67
+     ],
+     "size": [
+      56.0,
+      310.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "file": "layouts/results/beyond_cool_line.png"
+    },
+    {
+     "name": "scaled_and_rotated_pixel",
+     "ctype": "SpriteObjectData",
+     "type": "Sprite",
+     "action_tag": -162001005,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      45.0,
+      45.0
+     ],
+     "position": [
+      630.000488,
+      258.000305
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      14.0,
+      14.0
+     ],
+     "size": [
+      1.0,
+      1.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "file": "img/white.png"
+    },
+    {
+     "name": "percentage_back",
+     "ctype": "SpriteObjectData",
+     "type": "Sprite",
+     "action_tag": -1388755245,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      635.0,
+      220.0
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      0.6,
+      0.6
+     ],
+     "size": [
+      315.0,
+      63.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "file": "layouts/results/percentage_back.png"
+    },
+    {
+     "name": "performance_text",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": 107846128,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      607.0,
+      405.0
+     ],
+     "anchor": [
+      1.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      105.0,
+      28.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 16.0,
+     "text": "Performance",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/L2-Semibold.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "partner_text",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -1728745209,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      607.0,
+      365.0
+     ],
+     "anchor": [
+      1.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      63.0,
+      28.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 16.0,
+     "text": "Partner",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/L2-Semibold.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "affinity_text",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -1227000337,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      607.0,
+      325.0
+     ],
+     "anchor": [
+      1.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      62.0,
+      28.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 16.0,
+     "text": "Affinity",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/L2-Semibold.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "fragboost_text",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -1486036193,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      607.0,
+      285.0
+     ],
+     "anchor": [
+      1.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      89.0,
+      28.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 16.0,
+     "text": "Frag Boost",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/L2-Semibold.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "performance_amount",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -66507296,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      653.0,
+      405.0
+     ],
+     "anchor": [
+      0.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      0.95
+     ],
+     "size": [
+      77.0,
+      39.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 26.0,
+     "text": "6.16%",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/Exo-Regular.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "partner_amount",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -582247223,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      653.0,
+      365.0
+     ],
+     "anchor": [
+      0.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      57.0,
+      39.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 26.0,
+     "text": "x 1.0",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/Exo-Regular.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "affinity_amount",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": 498462589,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      653.0,
+      325.0
+     ],
+     "anchor": [
+      0.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      57.0,
+      39.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 26.0,
+     "text": "x 1.0",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/Exo-Regular.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "fragboost_amount",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": 396751340,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      653.0,
+      285.0
+     ],
+     "anchor": [
+      0.0,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      57.0,
+      39.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 26.0,
+     "text": "x 1.0",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/Exo-Regular.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "breached_disable_partner",
+     "ctype": "ImageViewObjectData",
+     "type": "ImageView",
+     "action_tag": 1196409815,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      631.059998,
+      365.171295
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      0.6667,
+      0.6667
+     ],
+     "size": [
+      522.0,
+      164.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [
+      {
+       "name": "breached_disable_text",
+       "ctype": "TextObjectData",
+       "type": "Text",
+       "action_tag": 2094896391,
+       "visible": true,
+       "alpha": 255.0,
+       "rotation": [
+        0.0,
+        0.0
+       ],
+       "position": [
+        260.5,
+        82.0
+       ],
+       "anchor": [
+        0.5,
+        0.5
+       ],
+       "scale": [
+        1.0,
+        1.0
+       ],
+       "size": [
+        142.0,
+        31.0
+       ],
+       "color": [
+        255,
+        255,
+        255,
+        255
+       ],
+       "flip": [
+        false,
+        false
+       ],
+       "touch_enable": false,
+       "children": [],
+       "font_size": 18.0,
+       "text": "INSCRIBED LAW",
+       "halign": "",
+       "valign": "",
+       "font": "Fonts/L2-Semibold.ttf",
+       "outline_enabled": true,
+       "outline_size": 2.0,
+       "shadow_enabled": false,
+       "shadow_offset": [
+        2.0,
+        -2.0
+       ],
+       "outline_color": [
+        57,
+        1,
+        22,
+        255
+       ],
+       "shadow_color": [
+        113,
+        101,
+        122,
+        255
+       ]
+      }
+     ],
+     "file": "layouts/1080/breached/results/disabled-stat.png"
+    },
+    {
+     "name": "beyond_total_amount",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -92094277,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      653.0,
+      218.0
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      0.95
+     ],
+     "size": [
+      131.0,
+      68.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 44.0,
+     "text": "61.6%",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/Exo-Regular.ttf",
+     "outline_enabled": true,
+     "outline_size": 5.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      60,
+      56,
+      118,
+      255
+     ],
+     "shadow_color": [
+      113,
+      101,
+      122,
+      255
+     ]
+    },
+    {
+     "name": "beyond_total_text",
+     "ctype": "SingleNodeObjectData",
+     "type": "Node",
+     "action_tag": 1200840249,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "anchor": [
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [
+      {
+       "name": "beyond_text",
+       "ctype": "TextObjectData",
+       "type": "Text",
+       "action_tag": 490071965,
+       "visible": true,
+       "alpha": 255.0,
+       "rotation": [
+        0.0,
+        0.0
+       ],
+       "position": [
+        0.0,
+        15.0
+       ],
+       "anchor": [
+        1.0,
+        0.5
+       ],
+       "scale": [
+        1.0,
+        1.0
+       ],
+       "size": [
+        59.0,
+        25.0
+       ],
+       "color": [
+        255,
+        255,
+        255,
+        255
+       ],
+       "flip": [
+        false,
+        false
+       ],
+       "touch_enable": false,
+       "children": [],
+       "font_size": 14.0,
+       "text": "BEYOND",
+       "halign": "",
+       "valign": "",
+       "font": "Fonts/L2-Semibold.ttf",
+       "outline_enabled": true,
+       "outline_size": 2.0,
+       "shadow_enabled": false,
+       "shadow_offset": [
+        2.0,
+        -2.0
+       ],
+       "outline_color": [
+        60,
+        56,
+        118,
+        255
+       ],
+       "shadow_color": [
+        113,
+        101,
+        122,
+        255
+       ]
+      },
+      {
+       "name": "total_text",
+       "ctype": "TextObjectData",
+       "type": "Text",
+       "action_tag": -1899981276,
+       "visible": true,
+       "alpha": 255.0,
+       "rotation": [
+        0.0,
+        0.0
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "anchor": [
+        1.0,
+        0.5
+       ],
+       "scale": [
+        1.0,
+        1.0
+       ],
+       "size": [
+        48.0,
+        25.0
+       ],
+       "color": [
+        255,
+        255,
+        255,
+        255
+       ],
+       "flip": [
+        false,
+        false
+       ],
+       "touch_enable": false,
+       "children": [],
+       "font_size": 14.0,
+       "text": "TOTAL",
+       "halign": "",
+       "valign": "",
+       "font": "Fonts/L2-Semibold.ttf",
+       "outline_enabled": true,
+       "outline_size": 2.0,
+       "shadow_enabled": false,
+       "shadow_offset": [
+        2.0,
+        -2.0
+       ],
+       "outline_color": [
+        60,
+        56,
+        118,
+        255
+       ],
+       "shadow_color": [
+        113,
+        101,
+        122,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "scoreSection",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": -1270055106,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    437.859985,
+    468.865112
+   ],
+   "anchor": [
+    0.0,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    691.0,
+    394.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/res_scoresection.png"
+  },
+  {
+   "name": "scoreSectionHigh",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": 245335346,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    437.859985,
+    469.115204
+   ],
+   "anchor": [
+    0.0,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    691.0,
+    394.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/res_scoresection_high.png"
+  },
+  {
+   "name": "hpNode",
+   "ctype": "SingleNodeObjectData",
+   "type": "Node",
+   "action_tag": -341912215,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    465.820007,
+    451.264496
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": []
+  },
+  {
+   "name": "songImage",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": -934523524,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    90.0,
+    451.929993
+   ],
+   "anchor": [
+    0.0,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    375.0,
+    375.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "Default/ImageFile.png"
+  },
+  {
+   "name": "scoreLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 717446837,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    368.833099
+   ],
+   "anchor": [
+    0.5,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    272.0,
+    71.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 60.0,
+   "text": "09'123'456",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/GeosansLight.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    3.0,
+    -3.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    37,
+    37,
+    37,
+    255
+   ]
+  },
+  {
+   "name": "pastScoreLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1148435824,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    769.999878,
+    345.930511
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    124.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 27.0,
+   "text": "09'123'456",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/GeosansLight.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    211,
+    211,
+    211,
+    255
+   ],
+   "shadow_color": [
+    63,
+    29,
+    60,
+    255
+   ]
+  },
+  {
+   "name": "scoreDiffLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 247968104,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    875.0,
+    345.930206
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    74.0,
+    23.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 18.0,
+   "text": "+450'000",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/GeosansLight.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    211,
+    211,
+    211,
+    255
+   ],
+   "shadow_color": [
+    63,
+    29,
+    60,
+    255
+   ]
+  },
+  {
+   "name": "pureBacking",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": 334178829,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    623.0,
+    186.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    249.0,
+    45.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/pure-count.png"
+  },
+  {
+   "name": "farBacking",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": 1388052897,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    623.0,
+    149.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    248.0,
+    43.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/far-count.png"
+  },
+  {
+   "name": "lostBacking",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": -2008343764,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    623.0,
+    112.5
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    248.0,
+    43.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/lost-count.png"
+  },
+  {
+   "name": "pureLabel-fullnolocalize",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1565694392,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    629.0,
+    185.0
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    55.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "PURE",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    126,
+    116,
+    162,
+    255
+   ],
+   "shadow_color": [
+    158,
+    148,
+    194,
+    255
+   ]
+  },
+  {
+   "name": "farLabel-fullnolocalize",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 2104824960,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    622.0,
+    147.0
+   ],
+   "anchor": [
+    1.0,
+    0.4523
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    40.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "FAR",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    166,
+    114,
+    89,
+    255
+   ],
+   "shadow_color": [
+    198,
+    146,
+    121,
+    255
+   ]
+  },
+  {
+   "name": "lostLabel-fullnolocalize",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -10432507,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    629.0,
+    111.5
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    54.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "LOST",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    149,
+    120,
+    133,
+    255
+   ],
+   "shadow_color": [
+    181,
+    152,
+    165,
+    255
+   ]
+  },
+  {
+   "name": "perfectCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1369853012,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    700.0,
+    186.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    48.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "1765",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    126,
+    116,
+    162,
+    255
+   ],
+   "shadow_color": [
+    158,
+    148,
+    194,
+    255
+   ]
+  },
+  {
+   "name": "nearCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1952318092,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    700.0,
+    149.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    26.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "24",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    166,
+    114,
+    89,
+    255
+   ],
+   "shadow_color": [
+    198,
+    146,
+    121,
+    255
+   ]
+  },
+  {
+   "name": "missCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1570969443,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    700.0,
+    112.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    26.0,
+    32.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "24",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    149,
+    120,
+    133,
+    255
+   ],
+   "shadow_color": [
+    181,
+    152,
+    165,
+    255
+   ]
+  },
+  {
+   "name": "difficultyBacking",
+   "ctype": "ImageViewObjectData",
+   "type": "ImageView",
+   "action_tag": 1150326034,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    135.0,
+    492.360413
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    391.0,
+    110.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/1080/results/max-recall-byd.png"
+  },
+  {
+   "name": "difficultyLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 532915458,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    54.0,
+    491.893494
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    36.0,
+    49.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 34.0,
+   "text": "12",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-Medium.ttf",
+   "outline_enabled": true,
+   "outline_size": 2.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    181,
+    18,
+    46,
+    255
+   ],
+   "shadow_color": [
+    181,
+    18,
+    46,
+    255
+   ]
+  },
+  {
+   "name": "difficultyPlusLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1545217631,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    68.0,
+    501.788788
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    17.0,
+    36.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 24.0,
+   "text": "+",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-Medium.ttf",
+   "outline_enabled": true,
+   "outline_size": 2.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    181,
+    18,
+    46,
+    255
+   ],
+   "shadow_color": [
+    181,
+    18,
+    46,
+    255
+   ]
+  },
+  {
+   "name": "difficultyNameLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -54411411,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    96.0,
+    504.267487
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    81.0,
+    32.0
+   ],
+   "color": [
+    111,
+    82,
+    112,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "FUTURE",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    172,
+    172,
+    172,
+    255
+   ]
+  },
+  {
+   "name": "maxrecallLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1491388164,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    96.0,
+    477.777893
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    119.0,
+    32.0
+   ],
+   "color": [
+    76,
+    67,
+    96,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "MAX RECALL",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "maxComboCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -801210066,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    256.0,
+    477.0
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    48.0,
+    32.0
+   ],
+   "color": [
+    76,
+    67,
+    96,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "2411",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    240,
+    255
+   ],
+   "shadow_color": [
+    183,
+    183,
+    183,
+    255
+   ]
+  },
+  {
+   "name": "nextButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": 1904908697,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    -1.0,
+    -1.0
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    324.0,
+    102.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/results/back.png",
+   "pressed_file": "layouts/1080/results/back_pressed.png",
+   "disabled_file": "layouts/1080/results/back.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "nextText",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -124534643,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    97.0,
+    41.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    0.95
+   ],
+   "size": [
+    55.0,
+    33.0
+   ],
+   "color": [
+    70,
+    60,
+    85,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 22.0,
+   "text": "Back",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    113,
+    101,
+    122,
+    255
+   ]
+  },
+  {
+   "name": "sticker_button",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": 1401144688,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    213.000305,
+    40.000099
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.667,
+    0.667
+   ],
+   "size": [
+    168.0,
+    85.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/multiplayer/sticker_tray/sticker-button.png",
+   "pressed_file": "layouts/multiplayer/sticker_tray/sticker-button-pressed.png",
+   "disabled_file": "layouts/multiplayer/sticker_tray/sticker-button-pressed.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "shareButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -867193407,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    637.03363,
+    -1.0
+   ],
+   "anchor": [
+    0.5,
+    0.0
+   ],
+   "scale": [
+    0.6666,
+    0.6666
+   ],
+   "size": [
+    330.0,
+    100.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/results/mid_button.png",
+   "pressed_file": "layouts/1080/results/mid_button_pressed.png",
+   "disabled_file": "layouts/1080/results/mid_button.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "shareText",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 478637523,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    634.033508,
+    41.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    0.95
+   ],
+   "size": [
+    64.0,
+    33.0
+   ],
+   "color": [
+    70,
+    60,
+    85,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 22.0,
+   "text": "Share",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    113,
+    101,
+    122,
+    255
+   ]
+  },
+  {
+   "name": "gradeImage",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": 1373006451,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    278.549988
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    3.0,
+    3.0
+   ],
+   "size": [
+    151.0,
+    127.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "img/grade_ex.png"
+  },
+  {
+   "name": "clearTypeImage",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": -578232083,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    495.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.6,
+    1.6
+   ],
+   "size": [
+    839.0,
+    77.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "img/clear_normal.png"
+  },
+  {
+   "name": "shiningPerfectCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -536137968,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    730.0,
+    186.0
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    48.0,
+    32.0
+   ],
+   "color": [
+    140,
+    131,
+    158,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "+200",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    183,
+    183,
+    183,
+    255
+   ]
+  },
+  {
+   "name": "additionalInfoButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": 37213833,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    654.764221,
+    153.964294
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    200.0,
+    100.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "img/white.png",
+   "pressed_file": "img/white.png",
+   "disabled_file": "Default/Button_Disable.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "lateEarlyCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 2103004823,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    730.0,
+    149.0
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    97.0,
+    32.0
+   ],
+   "color": [
+    140,
+    131,
+    158,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "E200 L200",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": true,
+   "shadow_offset": [
+    1.0,
+    -1.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    183,
+    183,
+    183,
+    255
+   ]
+  },
+  {
+   "name": "retryButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -1007942018,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1280.0,
+    -1.0
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    -0.67,
+    0.67
+   ],
+   "size": [
+    324.0,
+    102.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/results/back.png",
+   "pressed_file": "layouts/1080/results/back_pressed.png",
+   "disabled_file": "layouts/1080/results/back.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "retryText",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1303070984,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1183.764893,
+    41.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    0.95
+   ],
+   "size": [
+    59.0,
+    33.0
+   ],
+   "color": [
+    70,
+    60,
+    85,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 22.0,
+   "text": "Retry",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    113,
+    101,
+    122,
+    255
+   ]
+  },
+  {
+   "name": "beyond_next_button",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -2063711997,
+   "visible": false,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    0.67,
+    0.67
+   ],
+   "size": [
+    324.0,
+    97.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/results/beyond_back_button.png",
+   "pressed_file": "layouts/results/beyond_back_button_pressed.png",
+   "disabled_file": "layouts/results/beyond_back_button_pressed.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "beyond_next_button_text",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 822178675,
+   "visible": true,
+   "alpha": 0.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    97.0,
+    41.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    101.0,
+    37.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 22.0,
+   "text": "Continue",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 2.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    54,
+    51,
+    104,
+    255
+   ],
+   "shadow_color": [
+    113,
+    101,
+    122,
+    255
+   ]
+  },
+  {
+   "name": "notsaved_back",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": 750589613,
+   "visible": false,
+   "alpha": 204.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    409.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    200.0,
+    25.0
+   ],
+   "size": [
+    1.0,
+    1.0
+   ],
+   "color": [
+    0,
+    0,
+    0,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "img/white.png"
+  },
+  {
+   "name": "notsaved_text",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 394334350,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.0,
+    409.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    110.0,
+    30.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "NOT SAVED",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  }
+ ]
+}
