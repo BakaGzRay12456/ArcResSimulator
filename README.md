@@ -64,3 +64,20 @@ python3 collect_assets.py [Assets6目录]
 
 模拟器渲染视口（画布）比例可自定义，布局以 1280x720 为设计基准，
 宽高比变化时按游戏逻辑重新计算角色偏移与缩放。
+
+## BEYOND 结算面板
+
+`--beyond` 显示 BEYOND 结算附加面板（Performance / Partner / Affinity /
+Frag Boost / TOTAL）。CSD 里该节点默认 `Visible=False` 且位于不透明成绩卡
+（scoreSection）之前，游戏运行时才打开；模拟器在 `--beyond` 时强制显示，
+并延后到成绩卡之后绘制（否则会被完全盖住）。左下角按钮在 BEYOND 模式下
+由 Back 换成 Continue（beyond_back_button.png）。面板数值可用以下参数覆盖：
+
+```bash
+python3 arc_res_simulator.py --beyond \
+    --beyond-performance '6.16%' --beyond-partner 'x 1.0' \
+    --beyond-affinity 'x 1.0' --beyond-fragboost 'x 1.0' --beyond-total '61.6%'
+```
+
+旋转节点（如 BEYOND 面板的 45° 菱形 `scaled_and_rotated_pixel`）按 Cocos
+旋转语义渲染（设计坐标 y 向上，正角逆时针，映射到 Pillow y 向下后取反）。

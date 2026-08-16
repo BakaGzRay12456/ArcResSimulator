@@ -154,6 +154,9 @@ class ResultsRenderer:
 
         self.char_img = self._load_alpha(opts.char) if opts.char else None
         self.char_icon = self._load_alpha(opts.char_icon) if opts.char_icon else None
+        # BEYOND 面板在 CSD 里位于 scoreSection 之前（会被不透明成绩卡盖住），
+        # 真实游戏里它覆盖在成绩卡之上，因此渲染时延后到成绩卡之后绘制
+        self._beyond_nodes = []
 
         if not opts.no_background:
             self._draw_background()
@@ -233,6 +236,12 @@ class ResultsRenderer:
             im = im.transpose(Image.FLIP_LEFT_RIGHT)
         if sy < 0:
             im = im.transpose(Image.FLIP_TOP_BOTTOM)
+        rot = 0.0
+        if isinstance(spec, dict):
+            rot = float(spec.get("rotation", (0.0, 0.0))[0])
+        if abs(rot) > 0.001:
+            # 设计坐标 y 向上、正角逆时针；映射到 Pillow y 向下后方向相反
+            im = im.rotate(-rot, resample=Image.BICUBIC, expand=False)
         px, py = self.to_px(left, y_hi)
         a = int(round(alpha))
         if a < 255:
@@ -295,16 +304,21 @@ class ResultsRenderer:
     def render(self):
         root = parse_layout.load_csd(LAYOUT)
         self._walk(root)
+        # 延后绘制 BEYOND 面板（盖在成绩卡之上）
+        for bn in self._beyond_nodes:
+            for c in bn["children"]:
+                self._walk(c)
         if not self.opts.no_topbar:
             self._draw_topbar()
         return self.canvas
 
     def _walk(self, node):
         """按 CSD 树顺序绘制（最终状态：所有 FadeIn 完成，alpha 视为 255）。"""
-        if not node.get("visible", True):
-            return
         name = node["name"]
         t = node["type"]
+        # beyond_result_node 在 CSD 里默认 Visible=False，仅 BEYOND 结算时由游戏运行时打开
+        if not node.get("visible", True) and not (name == "beyond_result_node" and self.opts.beyond):
+            return
 
         # ---- 特殊节点（setupResultUI 逻辑）----
         if name == "back" and t == "ImageView":
@@ -384,6 +398,21 @@ class ResultsRenderer:
                 early = self.opts.early if self.opts.early is not None else 0
                 self.draw_text("L%d  E%d" % (late, early), node, alpha=255)
             return
+        if name == "performance_amount" and self.opts.beyond_performance is not None:
+            self.draw_text(str(self.opts.beyond_performance), node, alpha=255)
+            return
+        if name == "partner_amount" and self.opts.beyond_partner is not None:
+            self.draw_text(str(self.opts.beyond_partner), node, alpha=255)
+            return
+        if name == "affinity_amount" and self.opts.beyond_affinity is not None:
+            self.draw_text(str(self.opts.beyond_affinity), node, alpha=255)
+            return
+        if name == "fragboost_amount" and self.opts.beyond_fragboost is not None:
+            self.draw_text(str(self.opts.beyond_fragboost), node, alpha=255)
+            return
+        if name == "beyond_total_amount" and self.opts.beyond_total is not None:
+            self.draw_text(str(self.opts.beyond_total), node, alpha=255)
+            return
         if name == "gradeImage":
             self._draw_grade(node)
             return
@@ -391,7 +420,20 @@ class ResultsRenderer:
             self._draw_clear_type(node)
             return
         if name in ("nextButton", "shareButton", "retryButton", "sticker_button"):
+            # BEYOND 结算时左下按钮由 Back 换成 Continue（beyond_next_button）
+            if name == "nextButton" and self.opts.beyond:
+                return
             self._draw_button(node)
+            return
+        if name == "beyond_next_button":
+            if self.opts.beyond:
+                self._draw_button(node)
+            return
+        if name == "nextText" and self.opts.beyond:
+            return
+        if name == "beyond_next_button_text":
+            if self.opts.beyond:
+                self.draw_text("Continue", node, alpha=255)
             return
         if name == "notsaved_back":
             self._draw_sprite_node(node, "img/white.png", alpha=204)
@@ -403,8 +445,7 @@ class ResultsRenderer:
         # ---- 可选/隐藏节点 ----
         if name.startswith("beyond_result_node"):
             if self.opts.beyond:
-                for c in node["children"]:
-                    self._walk(c)
+                self._beyond_nodes.append(node)
             return
         if name == "scoreSectionHigh":
             if self.opts.best:
@@ -646,6 +687,16 @@ def parse_args(argv=None):
     ap.add_argument("--time", type=float, default=0.8,
                     help="入场动画时刻 0~0.8 秒（0=初始 0.8=完成）")
     ap.add_argument("--beyond", action="store_true", help="显示 BEYOND 结算附加面板")
+    ap.add_argument("--beyond-performance", dest="beyond_performance", default=None,
+                    help="BEYOND 面板 Performance 值（如 6.16%%）")
+    ap.add_argument("--beyond-partner", dest="beyond_partner", default=None,
+                    help="BEYOND 面板 Partner 值（如 x 1.0）")
+    ap.add_argument("--beyond-affinity", dest="beyond_affinity", default=None,
+                    help="BEYOND 面板 Affinity 值（如 x 1.0）")
+    ap.add_argument("--beyond-fragboost", dest="beyond_fragboost", default=None,
+                    help="BEYOND 面板 Frag Boost 值（如 x 1.0）")
+    ap.add_argument("--beyond-total", dest="beyond_total", default=None,
+                    help="BEYOND 面板 TOTAL 值（如 61.6%%）")
     ap.add_argument("--not-saved", dest="not_saved", action="store_true",
                     help="显示 NOT SAVED 提示")
     ap.add_argument("--no-background", dest="no_background", action="store_true",
