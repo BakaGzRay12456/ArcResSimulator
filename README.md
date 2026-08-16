@@ -99,3 +99,32 @@ python3 arc_res_simulator.py --beyond \
 
 旋转节点（如 BEYOND 面板的 45° 菱形 `scaled_and_rotated_pixel`）按 Cocos
 旋转语义渲染（设计坐标 y 向上，正角逆时针，映射到 Pillow y 向下后取反）。
+
+## 课程模式进度滑块
+
+课程模式结算左侧有进度竖条（`progress_line`，设计坐标底 y=134、高 446）与
+菱形标记（`progress_diamond`）。模拟器按 `--progress/--progress-total` 计算
+进度比例 `r`：滑块高度 = 446·r（底固定，顶随进度上移）；菱形标记从 CSD 默认
+位置（= 满进度，顶 y=659）下移 (1−r)·446，x 不变。满进度时与 CSD 默认布局
+逐像素一致（无 IDA 依据，属合理视觉推断）。
+
+```bash
+python3 arc_res_simulator.py --mode course --progress 2 --progress-total 4
+```
+
+## NOT SAVED 覆盖条
+
+结算成绩未保存时游戏会显示黑色半透明横条 + 白字红边 "NOT SAVED"
+（`notsaved_back` 1×1 white.png 缩放 200×25、CColor 黑、alpha 204；
+`notsaved_text` Outline 红色）。CSD 里两者默认 `Visible=False`，用 `--notsaved`
+强制显示：
+
+```bash
+python3 arc_res_simulator.py --notsaved
+```
+
+## 搭档位
+
+`--partner`（默认）按搭档位计算立绘偏移；`--no-partner` 按非搭档位
+（IDA 中非搭档位会有一档 x 偏移被压成 0）。`--partner` 为显式参数，
+避免被 argparse 缩写匹配到 `--partner-name`。

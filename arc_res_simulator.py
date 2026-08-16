@@ -368,10 +368,11 @@ class ResultsRenderer:
         """
         name = node["name"]
         t = node["type"]
-        # beyond_result_node / beyond_next_button 在 CSD 里默认 Visible=False，
-        # 仅 BEYOND 结算时由游戏运行时打开（此处用 --beyond 强制显示）
-        beyond_forced = self.opts.beyond and name in ("beyond_result_node", "beyond_next_button")
-        if not node.get("visible", True) and not beyond_forced:
+        # beyond_result_node / beyond_next_button / notsaved_* 在 CSD 里默认
+        # Visible=False，仅由游戏运行时打开（--beyond / --notsaved 强制显示）
+        forced = (self.opts.beyond and name in ("beyond_result_node", "beyond_next_button")) \
+                  or (self.opts.notsaved and name in ("notsaved_back", "notsaved_text"))
+        if not node.get("visible", True) and not forced:
             return
 
         # 世界坐标/缩放：W = 父锚点 + 父局部缩放 * 自身位置；S 沿树累积
@@ -515,10 +516,11 @@ class ResultsRenderer:
                 self.draw_text("Continue", world, alpha=255)
             return
         if name == "notsaved_back":
-            self._draw_sprite_node(world, "img/white.png", alpha=204)
+            self._draw_sprite_node(world, "img/white.png", alpha=204, color=(0, 0, 0))
             return
         if name == "notsaved_text":
-            self.draw_text("NOT SAVED", world, alpha=255)
+            world["outline_enabled"] = True
+            self.draw_text("NOT SAVED", world, alpha=255, outline_color=(255, 0, 0))
             return
 
         # ---- Course 模式：分数/课程名/进度/条件 覆盖 ----
@@ -534,6 +536,25 @@ class ResultsRenderer:
                 return
             if name == "progress_total_text" and t == "Text":
                 self.draw_text(str(self.opts.progress_total), world, alpha=255)
+                return
+            if name == "progress_line" and t == "Sprite":
+                # CSD 默认即「满进度」姿态：滑块底 y=580-446=134、顶 y=580。
+                # 未满时高度按进度比例收缩、底部固定；无 IDA 依据，属合理视觉推断。
+                ratio = self._progress_ratio()
+                h = 446.0 * ratio
+                n = dict(world)
+                n["size"] = (7.0, h)
+                n["position"] = (world["position"][0], 134.0 + h)
+                self._draw_sprite_node(n, "layouts/results/coursemode/prog-slider_grad.png")
+                return
+            if name == "progress_diamond" and t == "Sprite":
+                # 菱形标记随进度沿滑块上移：CSD 默认 y=659 为满进度位置，
+                # 未满时下移 (1-ratio)*446（与滑块同高）；x 保持。
+                ratio = self._progress_ratio()
+                n = dict(world)
+                x, y = world["position"]
+                n["position"] = (x, y - (1.0 - ratio) * 446.0)
+                self._draw_sprite_node(n, "layouts/results/coursemode/prog-icon.png")
                 return
             if name == "top_condition_text" and t == "Text" and self.opts.condition_top is not None:
                 self.draw_text(self.opts.condition_top, world, alpha=255)
@@ -638,6 +659,13 @@ class ResultsRenderer:
             s = self.opts.difficulty_color.lstrip("#")
             return tuple(int(s[i:i + 2], 16) for i in (0, 2, 4))
         return DIFFICULTIES.get(self.opts.difficulty, DIFFICULTIES["ftr"])["color"]
+
+    def _progress_ratio(self):
+        total = int(getattr(self.opts, "progress_total", 4) or 0)
+        if total <= 0:
+            return 1.0
+        cur = int(getattr(self.opts, "progress", 0) or 0)
+        return max(0.0, min(1.0, cur / total))
 
     def _level_parts(self):
         try:
@@ -822,6 +850,8 @@ def parse_args(argv=None):
     ap.add_argument("--char", default=None, help="角色立绘 PNG（用户传入）")
     ap.add_argument("--char-icon", dest="char_icon", default=None, help="角色头像 PNG")
     ap.add_argument("--char-id", type=int, default=0, help="角色 ID（决定偏移分档）")
+    ap.add_argument("--partner", dest="partner", action="store_true", default=True,
+                    help="按搭档位计算偏移（默认即搭档位，显式声明避免与 --partner-name 缩写混淆）")
     ap.add_argument("--no-partner", dest="partner", action="store_false",
                     help="按非搭档位计算偏移（默认搭档位）")
     ap.add_argument("--char-fit", default="contain",
@@ -869,6 +899,7 @@ def parse_args(argv=None):
     ap.add_argument("--time", type=float, default=0.8,
                     help="入场动画时刻 0~0.8 秒（0=初始 0.8=完成）")
     ap.add_argument("--beyond", action="store_true", help="显示 BEYOND 结算附加面板")
+    ap.add_argument("--notsaved", action="store_true", help="显示 NOT SAVED 覆盖条（成绩未保存提示）")
     ap.add_argument("--beyond-performance", dest="beyond_performance", default=None,
                     help="BEYOND 面板 Performance 值（如 6.16%%）")
     ap.add_argument("--beyond-partner", dest="beyond_partner", default=None,
