@@ -332,7 +332,7 @@ class ResultsRenderer:
         h_d = th / self.scale
         top_x = pos[0] - anchor[0] * w_d
         top_y = pos[1] - anchor[1] * h_d
-        px = top_x * self.scale
+        px = (top_x + self.off_x) * self.scale
         py = self.H - (top_y + h_d + self.off_y) * self.scale
 
         if color is None:
@@ -404,6 +404,32 @@ class ResultsRenderer:
             self._draw_mp_back()
         return self.canvas
 
+    def _edge_shift(self, world):
+        """3100 init 对底部按钮/文本的可见区补偿（设计单位，GameResultScene_init.c
+        0x10effa4~0x10f0768）：
+          nextButton/nextText  x -= off_x（贴屏幕左缘）
+          retryButton/retryText x += off_x（贴屏幕右缘）
+          shareButton/shareText x 不变（设计矩形居中）
+          六个的 y -= clamp(vis_h-720, 0, 240)/2（更高屏幕时仍贴住屏幕底边；
+          与 to_px 的 +off_y 相抵，故 720~960 高时按钮固定在同一屏幕位置）。
+        """
+        x, y = world["position"]
+        name = world["name"]
+        # init 用的是绝对 setPositionX（GameResultScene_init.c）：
+        #   nextButton:  (VW-1280)*-0.5        = -off_x
+        #   nextText:    (VW-1280)*-0.5 + 97   = -off_x + 97
+        #   retryButton: getPositionX() + (VW-1280)*0.5 = CSD x + off_x
+        #   retryText:   同上（CSD x=1183.76）
+        #   shareButton/shareText：不 setPositionX（设计矩形居中）
+        if name == "nextButton":
+            x = -self.off_x
+        elif name == "nextText":
+            x = -self.off_x + 97.0
+        elif name in ("retryButton", "retryText"):
+            x += self.off_x
+        y -= min(max(self.vis_h - DESIGN_H, 0.0), 240.0) / 2.0
+        return (x, y)
+
     def _walk(self, node, wx=0.0, wy=0.0, wsx=1.0, wsy=1.0):
         """按 CSD 树顺序绘制（最终状态：所有 FadeIn 完成，alpha 视为 255）。
 
@@ -455,12 +481,19 @@ class ResultsRenderer:
 
         # ---- 特殊节点（setupResultUI 逻辑）----
         if name == "back" and t == "ImageView":
-            if self.opts.mode == "single":
-                self._draw_sprite_node(world, "layouts/1080/results/results_bg.png")
+            if self.opts.mode == "course":
+                # 课程结算里 back 节点就是横幅（res_banner.png），无运行时尺寸覆盖
+                f = world.get("normal_file") or world.get("file")
+                if f:
+                    self._draw_sprite_node(world, f)
                 return
-            f = world.get("normal_file") or world.get("file")
-            if f:
-                self._draw_sprite_node(world, f)
+            # 3100 init（0x10efe24~0x10efe48）：back 节点 setContentSize(visibleSize/scale)
+            # 且 setOpacity(210)，即背景永远铺满整个可见区（任意屏幕比例），不是只盖
+            # 1280x720 设计矩形；单人与多人（Results.csb 基座）一致。
+            n = dict(world)
+            sx, sy = n["scale"]
+            n["size"] = (self.vis_w / sx, self.vis_h / sy)
+            self._draw_sprite_node(n, "layouts/1080/results/results_bg.png", alpha=210)
             return
         if name == "back_bar":
             if self.opts.mode == "single":
@@ -566,18 +599,25 @@ class ResultsRenderer:
             # BEYOND 结算时左下按钮由 Back 换成 Continue（beyond_next_button）
             if name == "nextButton" and self.opts.beyond:
                 return
-            if self.opts.mode == "multiplayer" and name == "retryButton":
-                return    # IDA：多人分支 retryButton setOpacity(0)
+            if self.opts.mode == "multiplayer" and name in ("retryButton", "nextButton"):
+                return    # IDA：多人分支 retry/next 被隐藏（setOpacity(0)），左下由 Continue 取代
+            if self.opts.mode != "multiplayer" and name == "sticker_button":
+                return    # 贴纸按钮 CSD alpha=0 且无动画，仅多人模式由运行时开启
+            world["position"] = self._edge_shift(world)
             self._draw_button(world)
             return
         if name == "retryText" and self.opts.mode == "multiplayer":
             return       # IDA：多人分支 retryText setOpacity(0)
+        if name == "nextText" and self.opts.mode == "multiplayer":
+            return       # IDA：多人分支 nextText setOpacity(0)
         if name == "beyond_next_button":
             if self.opts.beyond:
                 self._draw_button(world)
             return
         if name == "nextText" and self.opts.beyond:
             return
+        if name in ("nextText", "retryText", "shareText"):
+            world["position"] = self._edge_shift(world)
         if name == "beyond_next_button_text":
             if self.opts.beyond:
                 self.draw_text("Continue", world, alpha=255)
@@ -845,23 +885,29 @@ class ResultsRenderer:
         anchor = node["anchor"]
         top_x = node["position"][0] - anchor[0] * w_d
         top_y = node["position"][1] - anchor[1] * h_d
-        px = top_x * self.scale + offset[0] * self.scale
+        px = (top_x + self.off_x) * self.scale + offset[0] * self.scale
         py = self.H - (top_y + h_d + self.off_y) * self.scale - offset[1] * self.scale
         self.draw.text((px, py), text, font=font,
                        fill=(color[0], color[1], color[2], 255))
 
     # ---- 多人结算左下返回按钮（GameResultScene_init：Node v2+138）----
     def _draw_mp_back(self):
-        # 背景（btn-back-onlinealt-backing.png，213x62）+ 按钮（172x45）都在 (19,19)、
-        # anchor (0,0)；"Continue" 文本在 (92,42)、anchor (0.5,0.5)、字号 20、白色。
-        # 见 ida_dump/GameResultScene_init.c（0x10f0adc~0x10f0da4）。
-        spec = {"position": (19.0, 19.0), "anchor": (0.0, 0.0),
+        # IDA（GameResultScene_init.c 0x10f0a8c~0x10f0da4）：整组挂在 Node v2+138 下，
+        # 该 Node 未 setPosition → 默认 (0,0)，即整组紧贴屏幕左下角。
+        #   backing Sprite：setAnchorPoint(0,0)、无 setPosition → (0,0)，自然尺寸 213x62
+        #   Button：       setAnchorPoint(0,0)、setPosition(0x00000000, 0x41980000)=(0,19)，
+        #                  自然尺寸 172x45（不可拉伸到 backing 尺寸）
+        #   "Continue"：   setAnchorPoint(0.5,0.5)、setPosition(92,42)、字号 20、白色
+        spec = {"position": (0.0, 0.0), "anchor": (0.0, 0.0),
                 "size": (213.0, 62.0), "scale": (1.0, 1.0), "rotation": (0.0, 0.0)}
-        for f in ("img/multiplayer/btn-back-onlinealt-backing.png",
-                  "img/multiplayer/btn-back-onlinealt.png"):
-            pp = asset(f)
-            if pp:
-                self.draw_sprite(Image.open(pp).convert("RGBA"), spec, alpha=255)
+        pp = asset("img/multiplayer/btn-back-onlinealt-backing.png")
+        if pp:
+            self.draw_sprite(Image.open(pp).convert("RGBA"), spec, alpha=255)
+        btn = {"position": (0.0, 19.0), "anchor": (0.0, 0.0),
+               "size": (172.0, 45.0), "scale": (1.0, 1.0), "rotation": (0.0, 0.0)}
+        pp = asset("img/multiplayer/btn-back-onlinealt.png")
+        if pp:
+            self.draw_sprite(Image.open(pp).convert("RGBA"), btn, alpha=255)
         label = {"position": (92.0, 42.0), "anchor": (0.5, 0.5),
                  "font_size": 20.0, "font": "L2-Semibold.ttf",
                  "color": (255, 255, 255, 255)}
