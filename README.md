@@ -60,6 +60,11 @@ python3 arc_res_simulator.py --mode course       # 课程模式结算（--progre
 python3 arc_res_simulator.py --mode multiplayer  # 多人结算（4 张玩家卡）
 ```
 
+多人结算 = `Results.csd` 底层（成绩面板、曲封、分数、按钮，与单人同一棵树）
++ `MultiplayerResultsContent.csd` 玩家卡覆盖树 + 顶栏 + 左下 Continue 返回按钮
+（IDA：GameResultScene::init 同时加载两个 CSB，`TopBar::create` 无条件调用；
+多人分支把 `retryButton`/`retryText` setOpacity(0)，并新建 btn-back-onlinealt 按钮）。
+
 多人结算默认四席玩家数据，可用 `--mp-json` 整体覆盖（数组元素字段：
 name/score/grade/clear/diff/you/pure/far/lost/early/late/lifebar/icon）：
 

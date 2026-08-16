@@ -194,6 +194,7 @@ class ResultsRenderer:
         if getattr(opts, "mp_players", None):
             self.mp_players = opts.mp_players
         self._mp_idx = -1
+        self._in_mp_content = False
         # BEYOND 面板在 CSD 里位于 scoreSection 之前（会被不透明成绩卡盖住），
         # 真实游戏里它覆盖在成绩卡之上，因此渲染时延后到成绩卡之后绘制
         self._beyond_nodes = []
@@ -348,15 +349,30 @@ class ResultsRenderer:
 
     # ---- 主渲染 ----
     def render(self):
-        f = LAYOUTS.get(self.opts.mode, "Results.csd")
-        root = parse_layout.load_csd(os.path.join(BASE, "layout", f))
-        self._walk(root)
+        if self.opts.mode == "multiplayer":
+            # 真实游戏：GameResultScene 始终加载 Results.csb（成绩面板、曲封、
+            # 分数等），多人时在其上叠加 MultiplayerResultsContent.csb（玩家卡）。
+            # 见 ida_dump/GameResultScene_init.c：v2+99=Results.csb，v2+123=MP 内容。
+            base = parse_layout.load_csd(os.path.join(BASE, "layout", "Results.csd"))
+            self._in_mp_content = False
+            self._walk(base)
+            mp = parse_layout.load_csd(os.path.join(BASE, "layout",
+                                                    "MultiplayerResultsContent.csd"))
+            self._in_mp_content = True
+            self._walk(mp)
+            self._in_mp_content = False
+        else:
+            f = LAYOUTS.get(self.opts.mode, "Results.csd")
+            root = parse_layout.load_csd(os.path.join(BASE, "layout", f))
+            self._walk(root)
         # 延后绘制 BEYOND 面板（盖在成绩卡之上）
         for bn in self._beyond_nodes:
             for c in bn["children"]:
                 self._walk(c)
-        if not self.opts.no_topbar and self.opts.mode != "multiplayer":
+        if not self.opts.no_topbar:
             self._draw_topbar()
+        if self.opts.mode == "multiplayer":
+            self._draw_mp_back()
         return self.canvas
 
     def _walk(self, node, wx=0.0, wy=0.0, wsx=1.0, wsy=1.0):
@@ -503,8 +519,12 @@ class ResultsRenderer:
             # BEYOND 结算时左下按钮由 Back 换成 Continue（beyond_next_button）
             if name == "nextButton" and self.opts.beyond:
                 return
+            if self.opts.mode == "multiplayer" and name == "retryButton":
+                return    # IDA：多人分支 retryButton setOpacity(0)
             self._draw_button(world)
             return
+        if name == "retryText" and self.opts.mode == "multiplayer":
+            return       # IDA：多人分支 retryText setOpacity(0)
         if name == "beyond_next_button":
             if self.opts.beyond:
                 self._draw_button(world)
@@ -563,8 +583,8 @@ class ResultsRenderer:
                 self.draw_text(str(self.opts.condition_value), world, alpha=255)
                 return
 
-        # ---- 多人模式：4 张玩家卡数据覆盖 ----
-        if self.opts.mode == "multiplayer":
+        # ---- 多人模式：4 张玩家卡数据覆盖（仅遍历 MP 内容树时生效）----
+        if self.opts.mode == "multiplayer" and self._in_mp_content:
             import re as _re
             pm = _re.match(r"position_([1-4])$", name)
             if pm and t == "Node":
@@ -775,6 +795,23 @@ class ResultsRenderer:
         py = self.H - (top_y + h_d + self.off_y) * self.scale - offset[1] * self.scale
         self.draw.text((px, py), text, font=font,
                        fill=(color[0], color[1], color[2], 255))
+
+    # ---- 多人结算左下返回按钮（GameResultScene_init：Node v2+138）----
+    def _draw_mp_back(self):
+        # 背景（btn-back-onlinealt-backing.png，213x62）+ 按钮（172x45）都在 (19,19)、
+        # anchor (0,0)；"Continue" 文本在 (92,42)、anchor (0.5,0.5)、字号 20、白色。
+        # 见 ida_dump/GameResultScene_init.c（0x10f0adc~0x10f0da4）。
+        spec = {"position": (19.0, 19.0), "anchor": (0.0, 0.0),
+                "size": (213.0, 62.0), "scale": (1.0, 1.0), "rotation": (0.0, 0.0)}
+        for f in ("img/multiplayer/btn-back-onlinealt-backing.png",
+                  "img/multiplayer/btn-back-onlinealt.png"):
+            pp = asset(f)
+            if pp:
+                self.draw_sprite(Image.open(pp).convert("RGBA"), spec, alpha=255)
+        label = {"position": (92.0, 42.0), "anchor": (0.5, 0.5),
+                 "font_size": 20.0, "font": "L2-Semibold.ttf",
+                 "color": (255, 255, 255, 255)}
+        self.draw_text("Continue", label, alpha=255)
 
     # ---- 顶栏（TopBar 简化版）----
     def _draw_topbar(self):
