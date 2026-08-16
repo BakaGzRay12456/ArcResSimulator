@@ -97,10 +97,10 @@ def has_cjk(s):
 
 
 def score_text(score):
-    """Arcaea 分数格式：09'123'456 / 10'000'000。"""
+    """Arcaea 分数格式：8 位 2-3-3 分组，如 09'912'345 / 10'000'000。"""
     s = str(int(score))
-    if len(s) <= 9:
-        s = s.zfill(9)
+    if len(s) <= 8:
+        s = s.zfill(8)
         return "%s'%s'%s" % (s[:2], s[2:5], s[5:])
     out = []
     while s:
