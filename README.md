@@ -83,6 +83,27 @@ python3 arc_res_simulator.py --mode multiplayer --mp-json '[{"name":"Hikari","sc
   结算界面角色不是居中放，而是根据屏幕比例算一个横向偏移
   （详见 `ida_dump/Character_getResultsOffset.c` 注释）
 
+## 内嵌动画（CSB Timeline）
+
+三个结算 CSB 里 `Results.csb` 内嵌了入场动画（`<Animation Duration="180">`），
+CourseMode / 多人内容树为静态（Duration=0）。游戏会播放该动画，因此模拟器
+按用户指示「直接跑动画结束」：解析 `<Timeline>` 关键帧，每个属性取**最后一个
+关键帧**作为节点最终状态（`parse_layout.parse_animation_end`），再参与渲染：
+
+- `gradeImage`：静态 Scale 3.0（动画起帧）→ 结束 0.8
+- `clearTypeImage`：静态 Scale 1.6 → 结束 0.7
+- `hpNode` / `songImage`：x 左移约 59（曲封从 (90,452) → (31.3,452)）
+- PURE/FAR/LOST 计数、MAX COMBO、旧分数/分差：位置左移 + FadeIn 到 255
+
+`layout/nodes_dump.txt` 里被动画改动的节点带 `anim_end=` 标记。
+
+## 引擎 UI 缩放（1080 素材规则）
+
+Arcaea 魔改了 cocos2d 的 `Texture2D::initWithImage`：贴图路径含 `1080` 时，
+内容尺寸自动 ×0.66666666667（1080p 素材换算进 1280×720 设计空间，见
+`tex_1080_factor`）。布局 CSD 的节点尺寸已是设计单位（纹理拉伸到节点尺寸），
+常规节点不受影响；仅当节点没有显式尺寸、按贴图自然尺寸绘制时套用该系数。
+
 ## 屏幕比例
 
 模拟器渲染视口（画布）比例可自定义，布局以 1280x720 为设计基准，

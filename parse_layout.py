@@ -131,6 +131,36 @@ def parse_node(elem):
     return node
 
 
+
+def parse_animation_end(path):
+    """解析 CSD 里 <Animation> 时间轴，返回每个 ActionTag 的「最终状态」。
+
+    游戏在 .csb 里内嵌了入场动画（Timeline 关键帧）。用户指示：直接跑动画
+    结束即可 —— 即每个属性取最后一个关键帧的值：
+        Position / Scale / RotationSkew -> (x, y)
+        Alpha -> int
+    返回 { action_tag: { "Position": (x,y), "Scale": (x,y),
+                         "RotationSkew": (x,y), "Alpha": int } }
+    """
+    tree = ET.parse(path)
+    result = {}
+    for anim in tree.getroot().iter("Animation"):
+        for tl in anim.findall("Timeline"):
+            tag = int(tl.get("ActionTag", 0))
+            prop = tl.get("Property", "")
+            frames = list(tl)
+            if not frames:
+                continue
+            last = frames[-1]
+            if prop in ("Position", "Scale", "RotationSkew"):
+                val = (float(last.get("X", 0.0)), float(last.get("Y", 0.0)))
+            elif prop == "Alpha":
+                val = int(last.get("Value", 255))
+            else:
+                val = last.attrib
+            result.setdefault(tag, {})[prop] = val
+    return result
+
 def load_csd(path):
     """解析 CSD 文件，返回根节点 dict（渲染顺序 = children 顺序）。"""
     tree = ET.parse(path)
@@ -174,19 +204,28 @@ def dump_tree(node, depth=0, out=None):
         extra = f" text={node.get('text', '')!r} size={node.get('font_size', '')}"
     if "file" in node:
         extra += f" file={node['file']}"
+    anim = ""
+    if ANIM_END and node["action_tag"] in ANIM_END:
+        ae = ANIM_END[node["action_tag"]]
+        anim = " anim_end=" + " ".join(f"{k}{v}" for k, v in sorted(ae.items()))
     out.append(f"{'  '*depth}{node['name']} [{node['type']}] "
                f"pos=({pos[0]:.3f},{pos[1]:.3f}) scale=({sc[0]:.3f},{sc[1]:.3f}) "
                f"anchor=({an[0]:.3f},{an[1]:.3f}) size=({sz[0]:.3f},{sz[1]:.3f}) "
-               f"alpha={node['alpha']:.0f} vis={node['visible']}{extra}")
+               f"alpha={node['alpha']:.0f} vis={node['visible']}{extra}{anim}")
     for c in node["children"]:
         dump_tree(c, depth + 1, out)
     return out
+
+
+ANIM_END = {}   # main() 里填充，dump_tree 展示动画最终状态
 
 
 def main():
     src = sys.argv[1] if len(sys.argv) > 1 else "layout/Results.csd"
     out = sys.argv[2] if len(sys.argv) > 2 else "layout/Results.json"
     root = load_csd(src)
+    global ANIM_END
+    ANIM_END = parse_animation_end(src)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(root, f, ensure_ascii=False, indent=1)
     print(f"parsed {src} -> {out}")

@@ -44,6 +44,17 @@ import character_offset   # noqa: E402
 
 DESIGN_W = 1280.0
 DESIGN_H = 720.0
+# Arcaea 改了 cocos2d 引擎的 Texture2D::initWithImage：贴图路径里含 "1080" 时，
+# 内容尺寸自动 *0.66666666667（1080p 素材换算到 1280x720 设计空间）。
+# 布局 CSD 里的节点尺寸已是「设计单位」，纹理被拉伸到节点尺寸，故常规节点不受影响；
+# 仅在节点没有显式尺寸、按贴图自然尺寸绘制时才生效（见 _draw_sprite_node）。
+TEX_1080_SCALE = 2.0 / 3.0
+
+
+def tex_1080_factor(rel):
+    """路径含 "1080" 的贴图内容尺寸系数：0.66666666667，否则 1.0。"""
+    rel = (rel or "").replace("\\", "/")
+    return TEX_1080_SCALE if "1080" in rel else 1.0
 FONT_DIR = os.path.join(ASSETS, "Fonts")
 CJK_FONT = "NotoSansCJKsc-Regular.otf"
 CJK_FONT_BOLD = "NotoSansCJKsc-Bold.otf"
@@ -186,6 +197,10 @@ class ResultsRenderer:
         self.canvas = Image.new("RGBA", (self.W, self.H), (0, 0, 0, 255))
         self.draw = ImageDraw.Draw(self.canvas)
         self._font_cache = {}
+
+        # CSD 内嵌动画的最终状态（按 ActionTag），渲染时覆盖静态属性
+        self._anim = {}
+        self._anim_cache = {}
 
         self.char_img = self._load_alpha(opts.char) if opts.char else None
         self.char_icon = self._load_alpha(opts.char_icon) if opts.char_icon else None
@@ -348,7 +363,21 @@ class ResultsRenderer:
         return {}
 
     # ---- 主渲染 ----
+    def _anim_end(self, csd):
+        """CSD 的动画最终状态 map（缓存）：{action_tag: {prop: value}}。"""
+        if csd not in self._anim_cache:
+            self._anim_cache[csd] = parse_layout.parse_animation_end(
+                os.path.join(BASE, "layout", csd))
+        return self._anim_cache[csd]
+
     def render(self):
+        # 载入本次用到的 CSD 的内嵌动画最终状态（Course/MP 内容树 Duration=0 为空）
+        self._anim = {}
+        if self.opts.mode == "multiplayer":
+            for csd in ("Results.csd", "MultiplayerResultsContent.csd"):
+                self._anim.update(self._anim_end(csd))
+        else:
+            self._anim.update(self._anim_end(LAYOUTS.get(self.opts.mode, "Results.csd")))
         if self.opts.mode == "multiplayer":
             # 真实游戏：GameResultScene 始终加载 Results.csb（成绩面板、曲封、
             # 分数等），多人时在其上叠加 MultiplayerResultsContent.csb（玩家卡）。
@@ -391,14 +420,32 @@ class ResultsRenderer:
         if not node.get("visible", True) and not forced:
             return
 
-        # 世界坐标/缩放：W = 父锚点 + 父局部缩放 * 自身位置；S 沿树累积
+        # CSD 内嵌动画：直接取最终状态（用户指示：跑动画结束即可）。
+        # 覆盖的是节点「局部」属性，再与父级世界变换累加。
         sx, sy = node["scale"]
-        WX = wx + wsx * node["position"][0]
-        WY = wy + wsy * node["position"][1]
+        pos = node["position"]
+        rot = node["rotation"]
+        alpha = node["alpha"]
+        ae = self._anim.get(node["action_tag"])
+        if ae:
+            if "Position" in ae:
+                pos = ae["Position"]
+            if "Scale" in ae:
+                sx, sy = ae["Scale"]
+            if "RotationSkew" in ae:
+                rot = (ae["RotationSkew"][0], ae["RotationSkew"][1])
+            if "Alpha" in ae:
+                alpha = float(ae["Alpha"])
+
+        # 世界坐标/缩放：W = 父锚点 + 父局部缩放 * 自身位置；S 沿树累积
+        WX = wx + wsx * pos[0]
+        WY = wy + wsy * pos[1]
         SX, SY = wsx * sx, wsy * sy
         world = dict(node)
         world["position"] = (WX, WY)
         world["scale"] = (SX, SY)
+        world["rotation"] = rot
+        world["alpha"] = alpha
         if t == "Text":
             world["font_size"] = float(node.get("font_size", 20)) * SX
 
@@ -670,8 +717,15 @@ class ResultsRenderer:
         if not p:
             return
         img = Image.open(p).convert("RGBA")
+        # 节点没有显式尺寸时按贴图自然尺寸绘制；路径含 "1080" 的贴图
+        # 内容尺寸按引擎规则 *0.66666666667（Texture2D::initWithImage）。
+        if node["size"][0] <= 0 or node["size"][1] <= 0:
+            node = dict(node)
+            f = tex_1080_factor(file)
+            node["size"] = (img.size[0] * f, img.size[1] * f)
         if alpha is None:
-            alpha = 255 if node["alpha"] == 0 else node["alpha"]
+            # alpha 已含动画最终状态（CSD 静态 Alpha=0 的节点大多被 FadeIn 到 255）
+            alpha = node["alpha"]
         self.draw_sprite(img, node, alpha=alpha, color=color)
 
     def _diff_color(self):
@@ -892,8 +946,8 @@ def parse_args(argv=None):
     ap.add_argument("--no-partner", dest="partner", action="store_false",
                     help="按非搭档位计算偏移（默认搭档位）")
     ap.add_argument("--char-fit", default="contain",
-                    choices=["contain", "fill", "cover", "none"],
-                    help="立绘放进 1200x920 框的方式：contain 不变形；fill 拉伸；cover 裁切；none 原尺寸")
+                    choices=["contain", "fill", "cover", "none", "box"],
+                    help="立绘显示：contain 默认=游戏规则(像素×0.667 不变形)；fill 拉伸到 1200x920；cover 裁切铺满；none 原尺寸；box 放进 1200x920 框")
     ap.add_argument("--width", type=int, default=1280, help="画布宽度（像素）")
     ap.add_argument("--height", type=int, default=720, help="画布高度（像素）")
     ap.add_argument("--song", default="Sayonara Hatsukoi", help="曲名")
