@@ -31,6 +31,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(BASE, "assets")
+LAYOUTS = {
+    "single": "Results.csd",
+    "course": "Results_CourseMode.csd",
+    "multiplayer": "MultiplayerResultsContent.csd",
+}
 LAYOUT = os.path.join(BASE, "layout", "Results.csd")
 sys.path.insert(0, BASE)
 
@@ -60,6 +65,36 @@ CLEAR_FILES = {
     "pure": "img/clear_pure.png", "fail": "img/clear_fail.png",
     "hard": "img/clear_type/hard.png", "easy": "img/clear_type/easy.png",
 }
+# 多人结算：方形评级/通关徽章（img/grade/mini、img/clear_type 均为 110x110）
+MP_GRADE_FILES = {
+    "d": "img/grade/mini/d.png", "c": "img/grade/mini/c.png",
+    "b": "img/grade/mini/b.png", "a": "img/grade/mini/a.png",
+    "aa": "img/grade/mini/aa.png", "ex": "img/grade/mini/ex.png",
+    "explus": "img/grade/mini/explus.png",
+}
+MP_CLEAR_FILES = {
+    "normal": "img/clear_type/normal.png", "full": "img/clear_type/full.png",
+    "pure": "img/clear_type/pure.png", "fail": "img/clear_type/fail.png",
+    "hard": "img/clear_type/hard.png", "easy": "img/clear_type/easy.png",
+}
+MP_DIFF_TAGS = {
+    "pst": "layouts/multiplayer/tag-difficulty-past.png",
+    "prs": "layouts/multiplayer/tag-difficulty-present.png",
+    "ftr": "layouts/multiplayer/tag-difficulty-future.png",
+    "byd": "layouts/multiplayer/tag-difficulty-beyond.png",
+    "etr": "layouts/multiplayer/tag-difficulty-beyond.png",   # 无 ETERNAL 专属 tag，回退 beyond
+}
+# 多人结算默认玩家数据（--mp-json 可覆盖）
+MP_DEFAULT_PLAYERS = [
+    dict(name="Hikari", score=9900000, grade="ex", clear="pure", diff="ftr",
+         pure=1200, far=5, lost=0, early=1, late=2, lifebar="100%", you=True),
+    dict(name="Tairitsu", score=9820000, grade="ex", clear="full", diff="prs",
+         pure=1100, far=20, lost=10, early=5, late=8, lifebar="85%", you=False),
+    dict(name="Teto", score=9750000, grade="aa", clear="full", diff="pst",
+         pure=1050, far=30, lost=20, early=10, late=12, lifebar="70%", you=False),
+    dict(name="Kou", score=9600000, grade="aa", clear="normal", diff="byd",
+         pure=1000, far=40, lost=30, early=15, late=20, lifebar="55%", you=False),
+]
 
 # ---------------------------------------------------------------------------
 # 工具函数
@@ -154,6 +189,11 @@ class ResultsRenderer:
 
         self.char_img = self._load_alpha(opts.char) if opts.char else None
         self.char_icon = self._load_alpha(opts.char_icon) if opts.char_icon else None
+        # 多人模式玩家数据（--mp-json 覆盖默认四席）
+        self.mp_players = list(MP_DEFAULT_PLAYERS)
+        if getattr(opts, "mp_players", None):
+            self.mp_players = opts.mp_players
+        self._mp_idx = -1
         # BEYOND 面板在 CSD 里位于 scoreSection 之前（会被不透明成绩卡盖住），
         # 真实游戏里它覆盖在成绩卡之上，因此渲染时延后到成绩卡之后绘制
         self._beyond_nodes = []
@@ -300,20 +340,32 @@ class ResultsRenderer:
         self.draw.text((px, py), text, font=font, fill=fill,
                        stroke_width=stroke_w, stroke_fill=stroke_fill)
 
+    def _mp_player(self):
+        """当前 position_N 的玩家数据（N=1..4 对应数组下标 0..3）。"""
+        if 0 <= self._mp_idx < len(self.mp_players):
+            return self.mp_players[self._mp_idx]
+        return {}
+
     # ---- 主渲染 ----
     def render(self):
-        root = parse_layout.load_csd(LAYOUT)
+        f = LAYOUTS.get(self.opts.mode, "Results.csd")
+        root = parse_layout.load_csd(os.path.join(BASE, "layout", f))
         self._walk(root)
         # 延后绘制 BEYOND 面板（盖在成绩卡之上）
         for bn in self._beyond_nodes:
             for c in bn["children"]:
                 self._walk(c)
-        if not self.opts.no_topbar:
+        if not self.opts.no_topbar and self.opts.mode != "multiplayer":
             self._draw_topbar()
         return self.canvas
 
-    def _walk(self, node):
-        """按 CSD 树顺序绘制（最终状态：所有 FadeIn 完成，alpha 视为 255）。"""
+    def _walk(self, node, wx=0.0, wy=0.0, wsx=1.0, wsy=1.0):
+        """按 CSD 树顺序绘制（最终状态：所有 FadeIn 完成，alpha 视为 255）。
+
+        wx/wy/wsx/wsy：父级累计的世界锚点坐标与局部空间缩放（Cocos 语义：
+        子节点 Position 在父节点坐标系里，父级缩放会放大子节点的位置与尺寸；
+        本布局树旋转均为零，故只累加平移与缩放）。
+        """
         name = node["name"]
         t = node["type"]
         # beyond_result_node / beyond_next_button 在 CSD 里默认 Visible=False，
@@ -322,127 +374,227 @@ class ResultsRenderer:
         if not node.get("visible", True) and not beyond_forced:
             return
 
+        # 世界坐标/缩放：W = 父锚点 + 父局部缩放 * 自身位置；S 沿树累积
+        sx, sy = node["scale"]
+        WX = wx + wsx * node["position"][0]
+        WY = wy + wsy * node["position"][1]
+        SX, SY = wsx * sx, wsy * sy
+        world = dict(node)
+        world["position"] = (WX, WY)
+        world["scale"] = (SX, SY)
+        if t == "Text":
+            world["font_size"] = float(node.get("font_size", 20)) * SX
+
+        def children():
+            for c in node["children"]:
+                self._walk(c, WX, WY, SX, SY)
+
         # ---- 特殊节点（setupResultUI 逻辑）----
         if name == "back" and t == "ImageView":
-            self._draw_sprite_node(node, "layouts/1080/results/results_bg.png")
+            if self.opts.mode == "single":
+                self._draw_sprite_node(world, "layouts/1080/results/results_bg.png")
+                return
+            f = world.get("normal_file") or world.get("file")
+            if f:
+                self._draw_sprite_node(world, f)
             return
         if name == "back_bar":
-            self._draw_sprite_node(node, "layouts/1080/results/res_banner.png")
+            if self.opts.mode == "single":
+                self._draw_sprite_node(world, "layouts/1080/results/res_banner.png")
+                return
+            f = world.get("normal_file") or world.get("file")
+            if f:
+                self._draw_sprite_node(world, f)
             return
         if name == "character":
-            self._draw_character(node)
+            self._draw_character(world)
             return
         if name == "songImage":
-            self._draw_jacket(node)
+            self._draw_jacket(world)
             return
         if name == "songNameLabel-fullnolocalize":
-            self.draw_text(self.opts.song, node, alpha=255)
+            self.draw_text(self.opts.song, world, alpha=255)
             return
         if name == "songArtistLabel-fullnolocalize":
-            self.draw_text(self.opts.artist, node, alpha=255)
+            self.draw_text(self.opts.artist, world, alpha=255)
             return
         if name == "scoreLabel":
-            self.draw_text(score_text(self.opts.score), node, alpha=255,
+            self.draw_text(score_text(self.opts.score), world, alpha=255,
                            color=(255, 255, 255, 255))
             if self.opts.best:
-                so = node.get("shadow_offset", (3, -3))
-                self._draw_text_shadow(score_text(self.opts.score), node, (3.0, -3.0),
+                so = world.get("shadow_offset", (3, -3))
+                self._draw_text_shadow(score_text(self.opts.score), world, (3.0, -3.0),
                                        (15, 113, 133))
             return
         if name == "pastScoreLabel":
             if self.opts.past_score is not None:
-                self.draw_text(score_text(self.opts.past_score), node, alpha=255)
+                self.draw_text(score_text(self.opts.past_score), world, alpha=255)
             return
         if name == "scoreDiffLabel":
             if self.opts.score_diff is not None:
                 d = int(self.opts.score_diff)
                 sign = "+" if d >= 0 else "-"
-                self.draw_text(sign + num_text(abs(d)), node, alpha=255)
+                self.draw_text(sign + num_text(abs(d)), world, alpha=255)
             return
         if name == "difficultyBacking":
             d = DIFFICULTIES.get(self.opts.difficulty, DIFFICULTIES["ftr"])
-            self._draw_sprite_node(node, "layouts/1080/results/" + d["texture"])
+            self._draw_sprite_node(world, "layouts/1080/results/" + d["texture"])
             return
         if name == "difficultyLabel":
             level, _ = self._level_parts()
-            self.draw_text(level, node, alpha=255, color=(255, 255, 255, 255),
+            self.draw_text(level, world, alpha=255, color=(255, 255, 255, 255),
                            outline_color=self._diff_color())
             return
         if name == "difficultyPlusLabel":
             _, plus = self._level_parts()
             if plus:
-                self.draw_text("+", node, alpha=255, color=(255, 255, 255, 255),
+                self.draw_text("+", world, alpha=255, color=(255, 255, 255, 255),
                                outline_color=self._diff_color())
             return
         if name == "difficultyNameLabel":
             d = DIFFICULTIES.get(self.opts.difficulty, DIFFICULTIES["ftr"])
-            self.draw_text(d["label"], node, alpha=255, color=self._diff_color())
+            self.draw_text(d["label"], world, alpha=255, color=self._diff_color())
             return
         if name == "maxComboCountLabel":
-            self.draw_text(str(self.opts.combo), node, alpha=255)
+            self.draw_text(str(self.opts.combo), world, alpha=255)
             return
         if name == "perfectCountLabel":
-            self.draw_text(str(self.opts.pure), node, alpha=255)
+            self.draw_text(str(self.opts.pure), world, alpha=255)
             return
         if name == "nearCountLabel":
-            self.draw_text(str(self.opts.far), node, alpha=255)
+            self.draw_text(str(self.opts.far), world, alpha=255)
             return
         if name == "missCountLabel":
-            self.draw_text(str(self.opts.lost), node, alpha=255)
+            self.draw_text(str(self.opts.lost), world, alpha=255)
             return
         if name == "shiningPerfectCountLabel":
             if self.opts.shining is not None:
-                self.draw_text("+" + str(self.opts.shining), node, alpha=255)
+                self.draw_text("+" + str(self.opts.shining), world, alpha=255)
             return
         if name == "lateEarlyCountLabel":
             if self.opts.late is not None or self.opts.early is not None:
                 late = self.opts.late if self.opts.late is not None else 0
                 early = self.opts.early if self.opts.early is not None else 0
-                self.draw_text("L%d  E%d" % (late, early), node, alpha=255)
+                self.draw_text("L%d  E%d" % (late, early), world, alpha=255)
             return
         if name == "performance_amount" and self.opts.beyond_performance is not None:
-            self.draw_text(str(self.opts.beyond_performance), node, alpha=255)
+            self.draw_text(str(self.opts.beyond_performance), world, alpha=255)
             return
         if name == "partner_amount" and self.opts.beyond_partner is not None:
-            self.draw_text(str(self.opts.beyond_partner), node, alpha=255)
+            self.draw_text(str(self.opts.beyond_partner), world, alpha=255)
             return
         if name == "affinity_amount" and self.opts.beyond_affinity is not None:
-            self.draw_text(str(self.opts.beyond_affinity), node, alpha=255)
+            self.draw_text(str(self.opts.beyond_affinity), world, alpha=255)
             return
         if name == "fragboost_amount" and self.opts.beyond_fragboost is not None:
-            self.draw_text(str(self.opts.beyond_fragboost), node, alpha=255)
+            self.draw_text(str(self.opts.beyond_fragboost), world, alpha=255)
             return
         if name == "beyond_total_amount" and self.opts.beyond_total is not None:
-            self.draw_text(str(self.opts.beyond_total), node, alpha=255)
+            self.draw_text(str(self.opts.beyond_total), world, alpha=255)
             return
         if name == "gradeImage":
-            self._draw_grade(node)
+            self._draw_grade(world)
             return
         if name == "clearTypeImage":
-            self._draw_clear_type(node)
+            self._draw_clear_type(world)
             return
         if name in ("nextButton", "shareButton", "retryButton", "sticker_button"):
             # BEYOND 结算时左下按钮由 Back 换成 Continue（beyond_next_button）
             if name == "nextButton" and self.opts.beyond:
                 return
-            self._draw_button(node)
+            self._draw_button(world)
             return
         if name == "beyond_next_button":
             if self.opts.beyond:
-                self._draw_button(node)
+                self._draw_button(world)
             return
         if name == "nextText" and self.opts.beyond:
             return
         if name == "beyond_next_button_text":
             if self.opts.beyond:
-                self.draw_text("Continue", node, alpha=255)
+                self.draw_text("Continue", world, alpha=255)
             return
         if name == "notsaved_back":
-            self._draw_sprite_node(node, "img/white.png", alpha=204)
+            self._draw_sprite_node(world, "img/white.png", alpha=204)
             return
         if name == "notsaved_text":
-            self.draw_text("NOT SAVED", node, alpha=255)
+            self.draw_text("NOT SAVED", world, alpha=255)
             return
+
+        # ---- Course 模式：分数/课程名/进度/条件 覆盖 ----
+        if self.opts.mode == "course":
+            if name == "score" and t == "Text":
+                self.draw_text(score_text(self.opts.score), world, alpha=255)
+                return
+            if name == "course_name" and t == "Text":
+                self.draw_text(self.opts.song, world, alpha=255)
+                return
+            if name == "progress_current_text" and t == "Text":
+                self.draw_text(str(self.opts.progress), world, alpha=255)
+                return
+            if name == "progress_total_text" and t == "Text":
+                self.draw_text(str(self.opts.progress_total), world, alpha=255)
+                return
+            if name == "top_condition_text" and t == "Text" and self.opts.condition_top is not None:
+                self.draw_text(self.opts.condition_top, world, alpha=255)
+                return
+            if name == "bottom_condition_value_text" and t == "Text" and self.opts.condition_value is not None:
+                self.draw_text(str(self.opts.condition_value), world, alpha=255)
+                return
+
+        # ---- 多人模式：4 张玩家卡数据覆盖 ----
+        if self.opts.mode == "multiplayer":
+            import re as _re
+            pm = _re.match(r"position_([1-4])$", name)
+            if pm and t == "Node":
+                self._mp_idx = int(pm.group(1)) - 1
+                children()
+                self._mp_idx = -1
+                return
+            if name in ("position_button", "cover_button"):
+                return                    # 纯触摸区域（img/white.png，alpha=0）
+            pl = self._mp_player()
+            if t == "Text" and pl:
+                if name == "name":
+                    self.draw_text(pl.get("name", ""), world, alpha=255)
+                    return
+                if name == "score":
+                    self.draw_text(score_text(pl.get("score", 0)), world, alpha=255)
+                    return
+                if name == "lifebar":
+                    self.draw_text(str(pl.get("lifebar", "100%")), world, alpha=255)
+                    return
+                if name in ("pure", "far", "lost", "early", "late"):
+                    self.draw_text(str(pl.get(name, 0)), world, alpha=255)
+                    return
+            if name == "grade":
+                f = MP_GRADE_FILES.get(pl.get("grade", "ex")) or "layouts/multiplayer/explus.png"
+                self._draw_sprite_node(world, f)
+                return
+            if name == "clear":
+                f = MP_CLEAR_FILES.get(pl.get("clear", "pure")) or "layouts/multiplayer/pure.png"
+                self._draw_sprite_node(world, f)
+                return
+            if name == "diff":
+                f = MP_DIFF_TAGS.get(pl.get("diff", "ftr")) or "layouts/multiplayer/results/PST_tag.png"
+                self._draw_sprite_node(world, f)
+                return
+            if name == "you_tag":
+                if pl.get("you"):
+                    self._draw_sprite_node(world, "layouts/multiplayer/results/you-tag.png")
+                return
+            if name == "char_icon":
+                icon = pl.get("icon") if pl else None
+                if icon and os.path.exists(icon):
+                    img = Image.open(icon).convert("RGBA")
+                    w, h = world["size"]
+                    ws, hs = world["scale"]
+                    im = img.resize((max(1, int(round(w * abs(ws)))),
+                                     max(1, int(round(h * abs(hs))))), Image.LANCZOS)
+                    self.draw_sprite(im, world, alpha=255)
+                else:
+                    self._draw_sprite_node(world, "layouts/multiplayer/unknown_icon.png")
+                return
 
         # ---- 可选/隐藏节点 ----
         if name.startswith("beyond_result_node"):
@@ -451,24 +603,25 @@ class ResultsRenderer:
             return
         if name == "scoreSectionHigh":
             if self.opts.best:
-                self._draw_sprite_node(node, "layouts/1080/results/res_scoresection_high.png")
+                self._draw_sprite_node(world, "layouts/1080/results/res_scoresection_high.png")
             return
         if name == "additionalInfoButton":
             return
 
         # ---- 通用节点 ----
         if t == "Text":
-            txt = node.get("text", "")
+            txt = world.get("text", "")
             if txt:
-                self.draw_text(txt, node, alpha=255)
+                self.draw_text(txt, world, alpha=255)
+            children()
             return
         if t in ("Sprite", "ImageView", "Button"):
-            f = node.get("normal_file") or node.get("file")
+            f = world.get("normal_file") or world.get("file")
             if f:
-                self._draw_sprite_node(node, f)
+                self._draw_sprite_node(world, f)
+            children()
             return
-        for c in node["children"]:
-            self._walk(c)
+        children()
 
     # ---- 具体绘制 ----
     def _draw_sprite_node(self, node, file, alpha=None, color=None):
@@ -614,6 +767,17 @@ class ResultsRenderer:
             self.canvas.alpha_composite(ic,
                 (int(14 * self.scale), int((h_px - icon_size) / 2)))
 
+        # 搭档名（头像右侧）
+        if self.opts.partner_name:
+            pn = str(self.opts.partner_name)
+            font = self.get_font(20, "Exo-SemiBold.ttf", True, pn)
+            bbox = font.getbbox(pn)
+            tw = font.getlength(pn)
+            th = bbox[3] - bbox[1] if bbox else 0
+            tx = int((14 + 58 + 12) * self.scale)
+            ty = int((h_px - th) / 2) + (bbox[1] if bbox else 0)
+            self.draw.text((tx, ty), pn, font=font, fill=(255, 255, 255, 235))
+
         # frag 徽章
         fp = asset("layouts/1080/topbar/fragstack-singleplus.png") \
              or asset("layouts/1080/topbar/fragstack-single.png")
@@ -652,6 +816,9 @@ def parse_args(argv=None):
     ap = argparse.ArgumentParser(
         description="Arcaea 结算界面模拟器（3100 布局 + 角色偏移算法）",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    ap.add_argument("--mode", default="single",
+                    choices=["single", "course", "multiplayer"],
+                    help="结算模式：single 单人 / course 课程 / multiplayer 多人")
     ap.add_argument("--char", default=None, help="角色立绘 PNG（用户传入）")
     ap.add_argument("--char-icon", dest="char_icon", default=None, help="角色头像 PNG")
     ap.add_argument("--char-id", type=int, default=0, help="角色 ID（决定偏移分档）")
@@ -686,6 +853,19 @@ def parse_args(argv=None):
     ap.add_argument("--late", type=int, default=None, help="Late 数（显示 L.. E..）")
     ap.add_argument("--early", type=int, default=None, help="Early 数")
     ap.add_argument("--frag", type=int, default=24, help="顶栏碎片数")
+    ap.add_argument("--partner-name", dest="partner_name", default=None,
+                    help="顶栏搭档名（显示在头像右侧）")
+    ap.add_argument("--progress", type=int, default=3, help="课程进度当前值（第几首）")
+    ap.add_argument("--progress-total", dest="progress_total", type=int, default=4,
+                    help="课程进度总数")
+    ap.add_argument("--condition-top", dest="condition_top", default=None,
+                    help="课程条件顶部文本（覆盖 CSD 默认）")
+    ap.add_argument("--condition-value", dest="condition_value", default=None,
+                    help="课程条件剩余值（覆盖 CSD 默认）")
+    ap.add_argument("--mp-json", dest="mp_json", default=None,
+                    help="多人玩家 JSON（4 个元素数组），如 "
+                         "[{\"name\":\"A\",\"score\":9900000,\"grade\":\"ex\","
+                         "\"clear\":\"pure\",\"diff\":\"ftr\",\"you\":true},...]")
     ap.add_argument("--time", type=float, default=0.8,
                     help="入场动画时刻 0~0.8 秒（0=初始 0.8=完成）")
     ap.add_argument("--beyond", action="store_true", help="显示 BEYOND 结算附加面板")
@@ -714,6 +894,19 @@ def main(argv=None):
     opts = parse_args(argv)
     if opts.combo is None:
         opts.combo = opts.pure + opts.far
+    if opts.mp_json:
+        import json as _json
+        try:
+            data = _json.loads(opts.mp_json)
+            players = []
+            for i, d in enumerate(data):
+                p = dict(MP_DEFAULT_PLAYERS[i] if i < len(MP_DEFAULT_PLAYERS) else {})
+                p.update(d)
+                players.append(p)
+            opts.mp_players = players
+        except (ValueError, TypeError) as e:
+            print("--mp-json 解析失败：%s" % e, file=sys.stderr)
+            return 2
     r = ResultsRenderer(opts)
     img = r.render()
     out = opts.out

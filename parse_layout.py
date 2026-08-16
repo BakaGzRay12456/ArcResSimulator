@@ -46,6 +46,14 @@ def _pt(elem):
             float(elem.get("Y", elem.get("ScaleY", 0.0))))
 
 
+def _scale_of(elem):
+    """Cocos 节点默认 Scale=1；CSD 省略 <Scale> 时按 1 处理。"""
+    se = _child(elem, "Scale")
+    if se is None:
+        return (1.0, 1.0)
+    return (float(se.get("ScaleX", 1.0)), float(se.get("ScaleY", 1.0)))
+
+
 def _child(elem, name):
     if elem is None:
         return None
@@ -72,7 +80,8 @@ def parse_node(elem):
         "rotation": (float(a.get("RotationSkewX", 0)), float(a.get("RotationSkewY", 0))),
         "position": _pt(_child(elem, "Position")),
         "anchor": _pt(_child(elem, "AnchorPoint")),
-        "scale": _pt(_child(elem, "Scale")),
+        # Cocos 默认缩放为 1（CSD 里省略 <Scale> 的节点，如根 Layer，Scale=1）
+        "scale": _scale_of(elem),
         "size": _pt(_child(elem, "Size")),
         "color": _color(_child(elem, "CColor")),
         "flip": (a.get("FlipX", "False") == "True", a.get("FlipY", "False") == "True"),

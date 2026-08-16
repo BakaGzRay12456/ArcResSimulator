@@ -49,8 +49,26 @@ python3 collect_assets.py [Assets6目录]
 ```
 
 资源清单覆盖：
-1. 三个 CSD 里 `Path=` 引用的全部文件（Results 31 个、CourseMode 21 个、MP 28 个）
+1. 三个 CSD 里 `Path=` 引用的全部文件（Results 31 个、CourseMode 21 个、MP 44 个，含 grade/mini 评级与 tag-difficulty 难度标）
 2. 源码（IDA）引用但 CSB 没有的文件：曲封阴影、评级图、通关图、clear_type、多人按钮、CJK 兜底字体等
+
+## 三种模式
+
+```bash
+python3 arc_res_simulator.py --mode single       # 默认：单人结算
+python3 arc_res_simulator.py --mode course       # 课程模式结算（--progress/--condition-* 覆盖进度与条件）
+python3 arc_res_simulator.py --mode multiplayer  # 多人结算（4 张玩家卡）
+```
+
+多人结算默认四席玩家数据，可用 `--mp-json` 整体覆盖（数组元素字段：
+name/score/grade/clear/diff/you/pure/far/lost/early/late/lifebar/icon）：
+
+```bash
+python3 arc_res_simulator.py --mode multiplayer --mp-json '[{"name":"Hikari","score":9900000,"grade":"ex","clear":"pure","diff":"ftr","you":true,"pure":1200,"far":5,"lost":0,"early":1,"late":2,"lifebar":"100%","icon":"/path/to/char_icon.png"}, ...]'
+```
+
+其他参数：`--partner-name` 顶栏搭档名、`--no-topbar`、`--time 0~0.8` 入场动画、
+`--char-fill/--char-cover/--char-none` 立绘适配方式等。
 
 ## 角色立绘
 

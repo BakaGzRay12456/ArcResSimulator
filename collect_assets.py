@@ -47,6 +47,13 @@ RESULTS_CSB = [
 
 MP_CSB = [
     "Fonts/Exo-Medium.ttf", "Fonts/GeosansLight.ttf",
+    "img/grade/mini/a.png", "img/grade/mini/aa.png", "img/grade/mini/b.png",
+    "img/grade/mini/c.png", "img/grade/mini/d.png", "img/grade/mini/ex.png",
+    "img/grade/mini/explus.png",
+    "layouts/multiplayer/tag-difficulty-beyond.png",
+    "layouts/multiplayer/tag-difficulty-future.png",
+    "layouts/multiplayer/tag-difficulty-past.png",
+    "layouts/multiplayer/tag-difficulty-present.png",
     "img/grade_diamond_back.png", "img/white.png",
     "layouts/1080/multiplayer/results/gauge-ez.png",
     "layouts/1080/multiplayer/results/gauge-normal.png",
