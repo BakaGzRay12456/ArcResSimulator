@@ -19,6 +19,7 @@ LAYOUTS = [
     "layouts/results/Results.csb",
     "layouts/results/Results_CourseMode.csb",
     "layouts/multiplayer/MultiplayerResultsContent.csb",
+    "layouts/topbar/TopBar.csb",
 ]
 
 def main():

@@ -113,6 +113,9 @@ TOPBAR_CSB = [
     "layouts/1080/topbar/top_button_special_pressed.png",
     "layouts/topbar/cloud_sync.png", "layouts/topbar/settings.png",
     "layouts/topbar/status_bg.png", "layouts/topbar/top_bar_bg.png",
+    "layouts/results/potentialtext.png",
+    "img/char_icon_border.png",
+    "img/rating_0.png",
 ]
 
 CODE_REF = [

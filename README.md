@@ -73,15 +73,23 @@ python3 arc_res_simulator.py --mode multiplayer --mp-json '[{"name":"Hikari","sc
 ```
 
 其他参数：`--partner-name` 顶栏搭档名、`--no-topbar`、`--time 0~0.8` 入场动画、
-`--char-fill/--char-cover/--char-none` 立绘适配方式等。
+`--char-fit contain/fill/cover/none` 立绘适配方式等（默认 `contain`：等比缩放）。
 
 ## 角色立绘
 
 - 布局里角色节点 `character` 默认贴图 `startup/1080/char_h.png`（会被替换）
 - 模拟器使用用户传入的 `char.png`（立绘）与 `char_icon.png`（头像）
+- 立绘**等比缩放**：默认 `--char-fit contain`，按原图宽高比缩放到
+  `character` 节点 1200×920 内容盒内（不变形、不裁切，锚点 (0,1)
+  = 左上角，节点位置对齐立绘顶部，主体向下延伸，右侧/下方被屏幕裁掉
+  与游戏一致）；`fill` 会拉伸铺满（不推荐，会变形），`cover` 等比裁切铺满，
+  `none` 保持原尺寸。
 - 偏移算法见 `ida_dump/Character_getResultsOffset.c` 与 `getResultsOffset.c`：
-  结算界面角色不是居中放，而是根据屏幕比例算一个横向偏移
-  （详见 `ida_dump/Character_getResultsOffset.c` 注释）
+  3100 的 `Character::getResultsOffset` / `getCenterScreenOffset` 按角色 ID
+  分档给出横向/纵向偏移；**社区投稿预览统一使用 default 分支 (0, 0)**
+  （`character_offset.USE_DEFAULT_OFFSET = True`），避免未知新角色错位。
+  角色仍保留 setupResultUI 的通用定位：CSB 位置 + (-120, 0)，更方屏幕上
+  最多向下平移 100 设计单位，入场动画结束后 x 再 -200（MoveBy）。
 
 ## 内嵌动画（CSB Timeline）
 
@@ -97,12 +105,19 @@ CourseMode / 多人内容树为静态（Duration=0）。游戏会播放该动画
 
 `layout/nodes_dump.txt` 里被动画改动的节点带 `anim_end=` 标记。
 
-## 引擎 UI 缩放（1080 素材规则）
+## 3100 布局与 Assets6 纹理尺寸
 
-Arcaea 魔改了 cocos2d 的 `Texture2D::initWithImage`：贴图路径含 `1080` 时，
-内容尺寸自动 ×0.66666666667（1080p 素材换算进 1280×720 设计空间，见
-`tex_1080_factor`）。布局 CSD 的节点尺寸已是设计单位（纹理拉伸到节点尺寸），
-常规节点不受影响；仅当节点没有显式尺寸、按贴图自然尺寸绘制时套用该系数。
+3100 本身**没有** 5.x/6.x 才出现的 `/1080/`、`1080_` 资源管理模式。
+但是 3100、6.3/Arc-mobile 的 Results/TopBar CSD 节点几何基本一致：这里借用
+后者只确认布局，不把后者的内容资源或版本逻辑当成 3100 内容。
+
+本项目资源来自 Assets6。630/Arc-mobile 的 `Texture2D::initWithImage` 会在
+纹理路径含 `/1080/` 或 `1080_` 时把 **Sprite 的纹理 contentSize** 乘
+`0.66666666667`。模拟器只在绘制 `SpriteObjectData` 时模拟这一步；
+`ImageView`/`Button` 仍使用 CSD 明确的 `<Size>` 和 `<Scale>`，避免重复缩放。
+因此 `res_scoresection` 的原始 691x394 会显示为约 461x263，而结算布局的
+坐标仍是 CSD 的 1280x720 设计坐标。用户传入的 `char.png`/`char_icon.png`
+不按文件名套用该规则。
 
 ## 屏幕比例
 

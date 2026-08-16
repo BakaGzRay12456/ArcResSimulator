@@ -27,7 +27,7 @@ import math
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(BASE, "assets")
@@ -36,6 +36,7 @@ LAYOUTS = {
     "course": "Results_CourseMode.csd",
     "multiplayer": "MultiplayerResultsContent.csd",
 }
+TOPBAR_LAYOUT = "TopBar.csd"
 LAYOUT = os.path.join(BASE, "layout", "Results.csd")
 sys.path.insert(0, BASE)
 
@@ -44,17 +45,9 @@ import character_offset   # noqa: E402
 
 DESIGN_W = 1280.0
 DESIGN_H = 720.0
-# Arcaea 改了 cocos2d 引擎的 Texture2D::initWithImage：贴图路径里含 "1080" 时，
-# 内容尺寸自动 *0.66666666667（1080p 素材换算到 1280x720 设计空间）。
-# 布局 CSD 里的节点尺寸已是「设计单位」，纹理被拉伸到节点尺寸，故常规节点不受影响；
-# 仅在节点没有显式尺寸、按贴图自然尺寸绘制时才生效（见 _draw_sprite_node）。
-TEX_1080_SCALE = 2.0 / 3.0
-
-
-def tex_1080_factor(rel):
-    """路径含 "1080" 的贴图内容尺寸系数：0.66666666667，否则 1.0。"""
-    rel = (rel or "").replace("\\", "/")
-    return TEX_1080_SCALE if "1080" in rel else 1.0
+# 3100 的 CSD 坐标是本模拟器的布局真源。Assets6 的原始纹理则按 6.x
+# Texture2D 的路径规则解释（只在 Sprite 的自然 contentSize 上生效；见
+# _texture_path_scale/_draw_sprite_node），绝不改动 CSD 的设计坐标或全局 UI scale。
 FONT_DIR = os.path.join(ASSETS, "Fonts")
 CJK_FONT = "NotoSansCJKsc-Regular.otf"
 CJK_FONT_BOLD = "NotoSansCJKsc-Bold.otf"
@@ -162,6 +155,12 @@ def num_text(n):
         out.insert(0, s[-3:])
         s = s[:-3]
     return "'".join(out)
+
+
+def score_diff_text(n):
+    """3100 scoreSectionHigh 的固定 7 位分差格式。"""
+    digits = str(abs(int(n))).zfill(8)
+    return "'".join((digits[0:2], digits[2:5], digits[5:8]))
 
 
 def ease_out_cubic(f):
@@ -310,30 +309,64 @@ class ResultsRenderer:
             im = Image.merge("RGBA", (r2, g2, b2, im.getchannel("A")))
         self.canvas.alpha_composite(im, (int(px), int(py)))
 
+    def _text_layout(self, text, node, font):
+        """返回 Pillow 文本左上绘制点，使用 Cocos Text 的内容盒锚点。
+
+        CSD 的 <Size> 是 Text 节点的 content-size；锚点必须相对于该盒子而非
+        Pillow 的 glyph bbox。此前按 glyph 高度算锚点，会让成绩/高分等文字整体
+        下沉一截。Pillow 的 bbox[1] 仅用于把字形放回内容盒顶部。
+        """
+        pos = node["position"]
+        anchor = node["anchor"]
+        sx, sy = node.get("scale", (1.0, 1.0))
+        raw_w, raw_h = node.get("size", (0.0, 0.0))
+        # ui::Text::setString() 在 3100 的这些节点上使用的是自适应内容宽度：
+        # CSD 里的 Size 只是初始文案的测量尺寸。若继续拿它当固定盒子，长曲名
+        # 会从 x=429 开始，而官方会把新字符串以锚点 0.5 居中到 x=640；右锚点
+        # 的“残片/记忆源点”也会向左错几十像素。宽度统一改用当前 glyph 测量值，
+        # 高度仍保留 CSD 的行高（它包含字体 ascent/descent 的留白）。
+        bbox = font.getbbox(text)
+        text_w = font.getlength(text)
+        text_w_u = text_w / self.scale
+        box_w = text_w_u if text_w > 0 else abs(raw_w * sx)
+        box_h = abs(raw_h * sy)
+        if box_h <= 0:
+            ascent, descent = font.getmetrics()
+            box_h = (ascent + descent) / self.scale
+
+        left = pos[0] - anchor[0] * box_w
+        bottom = pos[1] - anchor[1] * box_h
+        top = bottom + box_h
+
+        # 内容宽度已按 setString() 自适应；显式对齐仍保留给需要固定盒子的
+        # 外部调用者。
+        halign = str(node.get("halign", "")).lower()
+        if halign in ("center", "1"):
+            x = left + max(0.0, box_w - text_w_u) * 0.5
+        elif halign in ("right", "2"):
+            x = left + max(0.0, box_w - text_w_u)
+        else:
+            x = left
+
+        # Cocos ui::Text 的默认垂直对齐是内容盒居中；不能把 glyph 顶边直接
+        # 贴到 Size 的上沿。保留 CSD 行高并在盒内垂直居中，能同时修正曲名、
+        # 曲师、主分数和高分条的整体上移。
+        visible_h = ((bbox[3] - bbox[1]) if bbox else font.size) / self.scale
+        visible_top = top - max(0.0, (box_h - visible_h) * 0.5)
+        px = (x + self.off_x) * self.scale
+        box_top_px = self.H - (visible_top + self.off_y) * self.scale
+        py = box_top_px - (bbox[1] if bbox else 0)
+        return px, py
+
     def draw_text(self, text, node, alpha=255, color=None, outline_color=None):
-        """按节点语义绘制文本（锚点、描边、阴影）。node 为解析出的 Text dict。"""
+        """按 Cocos ui::Text 的内容盒、锚点、描边和阴影绘制文本。"""
         if not text:
             return
         size = float(node.get("font_size", 20))
         font_name = node.get("font", "")
         bold = "Semibold" in font_name or "Bold" in font_name
         font = self.get_font(size, font_name, bold, text)
-        pos = node["position"]
-        anchor = node["anchor"]
-
-        bbox = font.getbbox(text)
-        tw = font.getlength(text)
-        th = bbox[3] - bbox[1] if bbox else 0
-        if th <= 0:
-            th = font.getmetrics()[0] + font.getmetrics()[1]
-
-        # 设计坐标：文本盒以锚点为中心
-        w_d = tw / self.scale
-        h_d = th / self.scale
-        top_x = pos[0] - anchor[0] * w_d
-        top_y = pos[1] - anchor[1] * h_d
-        px = (top_x + self.off_x) * self.scale
-        py = self.H - (top_y + h_d + self.off_y) * self.scale
+        px, py = self._text_layout(text, node, font)
 
         if color is None:
             color = node.get("color", (255, 255, 255, 255))
@@ -344,7 +377,7 @@ class ResultsRenderer:
         if shadow:
             so = node.get("shadow_offset", (0, 0))
             sc = node.get("shadow_color", (20, 20, 20, 255))
-            o = (so[0] * self.scale, -so[1] * self.scale)   # Cocos y 向上 → Pillow 翻转
+            o = (so[0] * self.scale, -so[1] * self.scale)
             self.draw.text((px + o[0], py + o[1]), text, font=font,
                            fill=(sc[0], sc[1], sc[2], alpha * sc[3] // 255))
         stroke_w = 0
@@ -404,6 +437,23 @@ class ResultsRenderer:
             self._draw_mp_back()
         return self.canvas
 
+    def _runtime_text(self, node):
+        """返回 CSB 节点在 3100 结算页完成初始化后的文案。"""
+        name = node.get("name", "")
+        topbar = {
+            "titleLabel": self.opts.topbar_title,
+            "fragmentsLabel": "残片",
+            "memoriesLabel": "记忆源点",
+            "fragmentsCountLabel": str(self.opts.frag),
+            "memoriesCountLabel": str(self.opts.memories),
+            "statusLabel": str(self.opts.potential),
+            "settingsLabel": "设置",
+            "leftButtonLabel": "同步",
+        }
+        if name in topbar:
+            return topbar[name]
+        return node.get("text", "")
+
     def _edge_shift(self, world):
         """3100 init 对底部按钮/文本的可见区补偿（设计单位，GameResultScene_init.c
         0x10effa4~0x10f0768）：
@@ -444,6 +494,16 @@ class ResultsRenderer:
         forced = (self.opts.beyond and name in ("beyond_result_node", "beyond_next_button")) \
                   or (self.opts.notsaved and name in ("notsaved_back", "notsaved_text"))
         if not node.get("visible", True) and not forced:
+            return
+        # TopBar::init 默认隐藏左按钮；GameResultScene 在在线状态下调用
+        # setupLeftButton 才把它显示出来。预览默认模拟在线，可由 CLI 关闭。
+        if name == "leftButtonContainer" and not self.opts.topbar_sync:
+            return
+        # 登录后的 3100 TopBar::updateInfo 会把 CSD 中的离线状态条和设置按钮
+        # 收起，改由运行时 UserCell/Potential 区域占位；离线预览才保留这组节点。
+        if getattr(self.opts, "topbar_online", True) and name in (
+                "statusBg", "statusLabel", "settingsButton", "settingsImage",
+                "settingsLabel"):
             return
 
         # CSD 内嵌动画：直接取最终状态（用户指示：跑动画结束即可）。
@@ -516,12 +576,16 @@ class ResultsRenderer:
             self.draw_text(self.opts.artist, world, alpha=255)
             return
         if name == "scoreLabel":
+            # setupResultUI 在新纪录时给 scoreLabel enableShadow(3,-3) 并把阴影
+            # 颜色设为 (15,113,133)。先画阴影再画白字，不能像旧实现那样把阴影
+            # 最后盖在字面上，否则整串分数会变成青色空心字。
+            if self.opts.best:
+                world = dict(world)
+                world["shadow_enabled"] = True
+                world["shadow_offset"] = (3.0, -3.0)
+                world["shadow_color"] = (15, 113, 133, 255)
             self.draw_text(score_text(self.opts.score), world, alpha=255,
                            color=(255, 255, 255, 255))
-            if self.opts.best:
-                so = world.get("shadow_offset", (3, -3))
-                self._draw_text_shadow(score_text(self.opts.score), world, (3.0, -3.0),
-                                       (15, 113, 133))
             return
         if name == "pastScoreLabel":
             if self.opts.past_score is not None:
@@ -531,7 +595,7 @@ class ResultsRenderer:
             if self.opts.score_diff is not None:
                 d = int(self.opts.score_diff)
                 sign = "+" if d >= 0 else "-"
-                self.draw_text(sign + num_text(abs(d)), world, alpha=255)
+                self.draw_text(sign + score_diff_text(d), world, alpha=255)
             return
         if name == "difficultyBacking":
             d = DIFFICULTIES.get(self.opts.difficulty, DIFFICULTIES["ftr"])
@@ -738,7 +802,7 @@ class ResultsRenderer:
 
         # ---- 通用节点 ----
         if t == "Text":
-            txt = world.get("text", "")
+            txt = self._runtime_text(world)
             if txt:
                 self.draw_text(txt, world, alpha=255)
             children()
@@ -752,17 +816,36 @@ class ResultsRenderer:
         children()
 
     # ---- 具体绘制 ----
+    @staticmethod
+    def _texture_path_scale(file):
+        """6.x Assets6 的 Texture2D::initWithImage 路径规则。
+
+        630/Arc-mobile 的 cocos2d 实现会在纹理 filePath 含 ``/1080/`` 或
+        ``1080_`` 时，把 Sprite 的 realPixels/contentSize 乘 2/3。这个规则
+        不是 3100 的资源管理规则；这里仅用于解释用户提供的 Assets6 纹理，
+        而不是修改 CSD 节点坐标或全局 UI scale。
+        """
+        f = str(file).replace("\\", "/")
+        return (2.0 / 3.0) if ("/1080/" in ("/" + f.lstrip("/")) or "1080_" in f) else 1.0
+
     def _draw_sprite_node(self, node, file, alpha=None, color=None):
         p = asset(file)
         if not p:
             return
         img = Image.open(p).convert("RGBA")
-        # 节点没有显式尺寸时按贴图自然尺寸绘制；路径含 "1080" 的贴图
-        # 内容尺寸按引擎规则 *0.66666666667（Texture2D::initWithImage）。
-        if node["size"][0] <= 0 or node["size"][1] <= 0:
-            node = dict(node)
-            f = tex_1080_factor(file)
-            node["size"] = (img.size[0] * f, img.size[1] * f)
+        node = dict(node)
+
+        # SpriteReader 不把 CSD 里记录的原始 <Size> 当成 Sprite 的最终
+        # contentSize；Sprite::initWithImage() 的纹理尺寸才是最终尺寸。
+        # Assets6 的 /1080/ 贴图在 630/Arc-mobile 引擎里已经是 2/3，
+        # 所以 scoreSection 691x394 必须以约 461x263 绘制。ImageView/
+        # Button 则由 CSD 显式 Size + Scale 控制，不能在这里重复缩放。
+        if node.get("type") == "Sprite":
+            factor = self._texture_path_scale(file)
+            node["size"] = (img.width * factor, img.height * factor)
+        elif node["size"][0] <= 0 or node["size"][1] <= 0:
+            node["size"] = img.size
+
         if alpha is None:
             # alpha 已含动画最终状态（CSD 静态 Alpha=0 的节点大多被 FadeIn 到 255）
             alpha = node["alpha"]
@@ -832,15 +915,17 @@ class ResultsRenderer:
             dw, dh = iw * s, ih * s
         elif fit == "none":
             dw, dh = iw, ih
-        else:  # contain（默认）：整幅放进框内，不变形不裁切
+        else:  # contain（默认）：等比缩放，整幅放进 1200x920 框内，不变形不裁切
             s = min(box_w / iw, box_h / ih)
             dw, dh = iw * s, ih * s
 
+        # anchor (0,1)=左上角：pos 是立绘的左上角，主体向 y 负方向延伸
         left = x0
         top = y0
         if fit == "cover":
+            # 等比裁切铺满：放大后以 1200x920 内容盒为中心对齐
             left = x0 - (dw - box_w) / 2.0
-            top = y0 - (dh - box_h) / 2.0
+            top = y0 + (dh - box_h) / 2.0
         self.draw_sprite(img, ((left, top), (dw, dh), (0, 1), (1, 1)), alpha=alpha)
 
         if self.opts.verbose:
@@ -856,14 +941,24 @@ class ResultsRenderer:
         p = asset("img/" + GRADE_FILES[grade])
         if not p:
             return
-        self.draw_sprite(Image.open(p).convert("RGBA"), node, alpha=255)
+        # setupResultUI 通过 Sprite::setSpriteFrame() 替换评级图；Cocos 会把
+        # Sprite content-size 更新为新 frame 的 original size，再保留 timeline
+        # 最终 scale=0.8。不能继续把 EX+ 强行塞进 CSD 初始 EX 的 151x127，
+        # 否则 EX+ 会窄一截且被拉高。
+        n = dict(node)
+        n["size"] = Image.open(p).size
+        self.draw_sprite(Image.open(p).convert("RGBA"), n, alpha=255)
 
     def _draw_clear_type(self, node):
         ct = self.opts.clear if self.opts.clear in CLEAR_FILES else "normal"
         p = asset(CLEAR_FILES[ct])
         if not p:
             return
-        self.draw_sprite(Image.open(p).convert("RGBA"), node, alpha=255)
+        # 与 gradeImage 相同：运行时 setSpriteFrame 后使用通关图自己的
+        # original size（full/pure/fail 的高度并不都等于 CSD 的 normal 预设）。
+        n = dict(node)
+        n["size"] = Image.open(p).size
+        self.draw_sprite(Image.open(p).convert("RGBA"), n, alpha=255)
 
     def _draw_button(self, node):
         f = node.get("normal_file") or node.get("file")
@@ -877,18 +972,9 @@ class ResultsRenderer:
     def _draw_text_shadow(self, text, node, offset, color):
         font = self.get_font(float(node.get("font_size", 60)), node.get("font", ""),
                              False, text)
-        bbox = font.getbbox(text)
-        tw = font.getlength(text)
-        th = bbox[3] - bbox[1] if bbox else 0
-        w_d = tw / self.scale
-        h_d = th / self.scale
-        anchor = node["anchor"]
-        top_x = node["position"][0] - anchor[0] * w_d
-        top_y = node["position"][1] - anchor[1] * h_d
-        px = (top_x + self.off_x) * self.scale + offset[0] * self.scale
-        py = self.H - (top_y + h_d + self.off_y) * self.scale - offset[1] * self.scale
-        self.draw.text((px, py), text, font=font,
-                       fill=(color[0], color[1], color[2], 255))
+        px, py = self._text_layout(text, node, font)
+        self.draw.text((px + offset[0] * self.scale, py - offset[1] * self.scale),
+                       text, font=font, fill=(color[0], color[1], color[2], 255))
 
     # ---- 多人结算左下返回按钮（GameResultScene_init：Node v2+138）----
     def _draw_mp_back(self):
@@ -913,65 +999,91 @@ class ResultsRenderer:
                  "color": (255, 255, 255, 255)}
         self.draw_text("Continue", label, alpha=255)
 
-    # ---- 顶栏（TopBar 简化版）----
+    # ---- 顶栏（3100 TopBar.csb + 运行时覆写）----
+    def _draw_topbar_avatar(self):
+        """绘制 3100 登录态 TopBar 的 UserCell + Potential 运行时控件。
+
+        UserCell 不在 TopBar.csb 中：TopBar::updateInfo 会在 status 区域创建头像，
+        再叠加评分星标；Potential 是同一运行时区域右侧的菱形徽章。这里使用
+        Assets6 中的真实 rating_0 / potentialtext 资源，角色头像仍由投稿者传入。
+        """
+        top_y = self.vis_h - self.off_y
+        icon_cx, icon_cy = 646.0, top_y - 28.0
+        icon_size = 70.0
+
+        if self.char_icon is not None:
+            # 头像在官方 UserCell 中以菱形显示，不让用户传入的方形 PNG 溢出边框。
+            iw = max(1, int(round(icon_size * self.scale)))
+            icon = self.char_icon.resize((iw, iw), Image.LANCZOS).convert("RGBA")
+            mask = Image.new("L", (iw, iw), 0)
+            md = ImageDraw.Draw(mask)
+            md.polygon([(iw // 2, 0), (iw - 1, iw // 2),
+                        (iw // 2, iw - 1), (0, iw // 2)], fill=255)
+            icon.putalpha(ImageChops.multiply(icon.getchannel("A"), mask))
+            self.draw_sprite(icon, ((icon_cx, icon_cy), (icon_size, icon_size),
+                                   (0.5, 0.5), (1.0, 1.0)), alpha=255)
+        border = asset("img/char_icon_border.png")
+        if border:
+            self.draw_sprite(Image.open(border).convert("RGBA"),
+                             ((icon_cx, icon_cy), (70.0, 70.0), (0.5, 0.5), (1.0, 1.0)),
+                             alpha=255)
+
+        # 3100 的星标由 UserCell::setupRating 设置。星形资源随等级变化，
+        # 预览中用小星列表达同一视觉层，不伪造固定 rating 等级贴图。
+        stars = max(0, min(3, int(self.opts.topbar_stars)))
+        if stars:
+            sw, sh = 36, 13
+            stars_img = Image.new("RGBA", (sw, sh), (0, 0, 0, 0))
+            sd = ImageDraw.Draw(stars_img)
+            for i in range(stars):
+                cx, cy, r = 7 + i * 11, 6, 5
+                pts = []
+                for k in range(10):
+                    a = -math.pi / 2.0 + k * math.pi / 5.0
+                    rr = r if k % 2 == 0 else r * 0.42
+                    pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr))
+                sd.polygon(pts, fill=(235, 35, 145, 255),
+                           outline=(116, 22, 102, 255))
+            self.draw_sprite(stars_img,
+                             ((icon_cx + 20.0, icon_cy - 22.0), (36.0, 13.0),
+                              (0.5, 0.5), (1.0, 1.0)), alpha=255)
+
+        # rating_0 是 3100 资源中的青色 Potential 菱形底图。
+        rating = asset("img/rating_0.png")
+        # rating_0 的 119px 原图在 iPad 顶栏会被顶部裁去一角：底部青色尖角
+        # 落在屏幕 y≈84。Potential 标签本身不随菱形一起下移，运行时是独立节点。
+        badge_cx, badge_cy = 750.0, top_y - 42.0
+        if rating:
+            self.draw_sprite(Image.open(rating).convert("RGBA"),
+                             ((badge_cx, badge_cy), (130.0, 130.0), (0.5, 0.5), (1.0, 1.0)),
+                             alpha=255)
+        potential_mark = asset("layouts/results/potentialtext.png")
+        if potential_mark:
+            self.draw_sprite(Image.open(potential_mark).convert("RGBA"),
+                             ((badge_cx, top_y - 18.0), (92.0, 20.0), (0.5, 0.5), (1.0, 1.0)),
+                             alpha=255)
+        delta = str(self.opts.topbar_potential_delta)
+        delta_node = {"position": (badge_cx, top_y - 52.0), "anchor": (0.5, 0.5),
+                      "size": (92.0, 16.0), "font_size": 18.0,
+                      "font": "Exo-SemiBold.ttf", "color": (225, 255, 255, 255)}
+        self.draw_text(delta, delta_node, alpha=255)
+
     def _draw_topbar(self):
-        p = asset("layouts/topbar/top_bar_bg.png")
-        if not p:
+        path = os.path.join(BASE, "layout", TOPBAR_LAYOUT)
+        if not os.path.isfile(path):
             return
-        bar = Image.open(p).convert("RGBA")
-        bw, bh = bar.size
-        w_px = self.W
-        h_px = max(1, int(round(self.W * bh / bw)))
-        bar = bar.resize((w_px, h_px), Image.LANCZOS)
-        self.canvas.alpha_composite(bar, (0, 0))
-
-        # 头像（左）
-        icon_size = int(round(58 * self.scale))
-        if self.char_icon:
-            ic = self.char_icon.resize((icon_size, icon_size), Image.LANCZOS)
-            self.canvas.alpha_composite(ic,
-                (int(14 * self.scale), int((h_px - icon_size) / 2)))
-
-        # 搭档名（头像右侧）
-        if self.opts.partner_name:
-            pn = str(self.opts.partner_name)
-            font = self.get_font(20, "Exo-SemiBold.ttf", True, pn)
-            bbox = font.getbbox(pn)
-            tw = font.getlength(pn)
-            th = bbox[3] - bbox[1] if bbox else 0
-            tx = int((14 + 58 + 12) * self.scale)
-            ty = int((h_px - th) / 2) + (bbox[1] if bbox else 0)
-            self.draw.text((tx, ty), pn, font=font, fill=(255, 255, 255, 235))
-
-        # frag 徽章
-        fp = asset("layouts/1080/topbar/fragstack-singleplus.png") \
-             or asset("layouts/1080/topbar/fragstack-single.png")
-        if fp:
-            pill = Image.open(fp).convert("RGBA")
-            pw = int(round(96 * self.scale))
-            phh = int(round(pill.size[1] * pw / pill.size[0]))
-            pill = pill.resize((pw, phh), Image.LANCZOS)
-            self.canvas.alpha_composite(pill,
-                (int((14 + 58 + 10) * self.scale), int((h_px - phh) / 2)))
-            font = self.get_font(18, "Exo-SemiBold.ttf", True, str(self.opts.frag))
-            bbox = font.getbbox(str(self.opts.frag))
-            tw = font.getlength(str(self.opts.frag))
-            th = bbox[3] - bbox[1]
-            tx = int((14 + 58 + 10) * self.scale) + (pw - tw) // 2
-            ty = int((h_px - th) / 2) + bbox[1]
-            self.draw.text((tx, ty), str(self.opts.frag), font=font,
-                           fill=(255, 255, 255, 235))
-
-        # 设置按钮（右）
-        sp = asset("layouts/1080/topbar/top_button_settings.png") \
-             or asset("layouts/1080/topbar/top_button.png")
-        if sp:
-            btn = Image.open(sp).convert("RGBA")
-            bw2 = int(round(56 * self.scale))
-            bh2 = int(round(btn.size[1] * bw2 / btn.size[0]))
-            btn = btn.resize((bw2, bh2), Image.LANCZOS)
-            self.canvas.alpha_composite(btn, (int(self.W - (14 + bw2) * self.scale),
-                                              int((h_px - bh2) / 2)))
+        root = parse_layout.load_csd(path)
+        # TopBar::init 将其 CSB 内容贴到 visibleSize 顶部；CSD 子节点自身高度为
+        # 300。渲染器还会在设计坐标转换时叠加 off_y，因此根位置要扣掉 off_y。
+        self._walk(root, wy=self.vis_h - self.off_y - root["size"][1])
+        if getattr(self.opts, "topbar_online", True):
+            if self.opts.topbar_account:
+                account = {"position": (500.0, self.vis_h - self.off_y - 28.0),
+                           "anchor": (0.5, 0.5), "size": (210.0, 30.0),
+                           "font_size": 26.0, "font": "GeosansLight.ttf",
+                           "color": (65, 65, 72, 255)}
+                self.draw_text(str(self.opts.topbar_account), account, alpha=255)
+            self._draw_topbar_avatar()
 
 
 # ---------------------------------------------------------------------------
@@ -993,7 +1105,7 @@ def parse_args(argv=None):
                     help="按非搭档位计算偏移（默认搭档位）")
     ap.add_argument("--char-fit", default="contain",
                     choices=["contain", "fill", "cover", "none", "box"],
-                    help="立绘显示：contain 默认=游戏规则(像素×0.667 不变形)；fill 拉伸到 1200x920；cover 裁切铺满；none 原尺寸；box 放进 1200x920 框")
+                    help="立绘显示：contain 默认=等比缩放放入 3100 CSD character 节点 1200x920 内容盒（不变形不裁切）；fill 拉伸铺满内容盒；cover 等比裁切铺满；none 原尺寸；box 是 contain 别名")
     ap.add_argument("--width", type=int, default=1280, help="画布宽度（像素）")
     ap.add_argument("--height", type=int, default=720, help="画布高度（像素）")
     ap.add_argument("--song", default="Sayonara Hatsukoi", help="曲名")
@@ -1007,19 +1119,31 @@ def parse_args(argv=None):
                     help="评级：d/c/b/a/aa/ex/explus")
     ap.add_argument("--clear", default="full", choices=list(CLEAR_FILES),
                     help="通关类型：normal/full/pure/fail/hard/easy")
-    ap.add_argument("--difficulty", default="ftr",
+    ap.add_argument("--difficulty", default="byd",
                     choices=list(DIFFICULTIES), help="难度：pst/prs/ftr/byd/etr")
     ap.add_argument("--difficulty-color", default=None, metavar="RRGGBB",
                     help="难度文字/描边颜色覆盖，如 FF6666")
     ap.add_argument("--level", default=12.0, type=float, help="难度等级（如 12 或 12.5）")
     ap.add_argument("--combo", type=int, default=None, help="最大连击（默认 pure+far）")
-    ap.add_argument("--pure", type=int, default=1765, help="Pure 数")
-    ap.add_argument("--far", type=int, default=24, help="Far 数")
+    ap.add_argument("--pure", type=int, default=2221, help="Pure 数")
+    ap.add_argument("--far", type=int, default=0, help="Far 数")
     ap.add_argument("--lost", type=int, default=0, help="Lost 数")
     ap.add_argument("--shining", type=int, default=None, help="回忆率溢出 Pure 数（显示 +N）")
     ap.add_argument("--late", type=int, default=None, help="Late 数（显示 L.. E..）")
     ap.add_argument("--early", type=int, default=None, help="Early 数")
     ap.add_argument("--frag", type=int, default=24, help="顶栏碎片数")
+    ap.add_argument("--memories", type=int, default=0, help="顶栏记忆源点数")
+    ap.add_argument("--potential", default="12.00", help="顶栏 Potential 数值（离线状态栏也沿用此值）")
+    ap.add_argument("--topbar-account", default="Username", help="登录态顶栏账号数字；传空字符串可隐藏")
+    ap.add_argument("--topbar-potential-delta", default="+ 0.01", help="顶栏 Potential 变化值")
+    ap.add_argument("--topbar-stars", type=int, default=3, help="头像右下角星数，0 可隐藏")
+    ap.add_argument("--no-topbar-online", dest="topbar_online", action="store_false",
+                    help="按离线 TopBar 绘制，保留 status/settings CSD 节点")
+    ap.set_defaults(topbar_online=True)
+    ap.add_argument("--topbar-title", default="结果", help="顶栏标题")
+    ap.add_argument("--no-topbar-sync", dest="topbar_sync", action="store_false",
+                    help="隐藏顶栏左侧同步按钮（离线状态）")
+    ap.set_defaults(topbar_sync=True)
     ap.add_argument("--partner-name", dest="partner_name", default=None,
                     help="顶栏搭档名（显示在头像右侧）")
     ap.add_argument("--progress", type=int, default=3, help="课程进度当前值（第几首）")
@@ -1062,6 +1186,8 @@ def main(argv=None):
     opts = parse_args(argv)
     if opts.combo is None:
         opts.combo = opts.pure + opts.far
+    if opts.score_diff is None and opts.best and opts.past_score is not None:
+        opts.score_diff = opts.score - opts.past_score
     if opts.mp_json:
         import json as _json
         try:

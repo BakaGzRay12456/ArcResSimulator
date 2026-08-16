@@ -20,7 +20,17 @@ Character::getResultsOffset / Character::getCenterScreenOffset 的忠实 Python 
 
 两个偏移函数都以「屏幕可见尺寸（设计单位，基准 1280x720）」为输入，
 先算出一个「超出 720 的纵向余量」v8，再按角色 ID 分档给出横向/纵向偏移。
+
+社区投稿预览约定：所有角色统一使用 3100 switch 的 default 分支 —— 偏移
+(0, 0)。各角色的专属分档仍保留在下方代码里作为 3100 参考（USE_DEFAULT_OFFSET
+关闭后可恢复）。
 """
+
+
+# 社区投稿预览：所有角色使用 3100 的 default (0, 0) 偏移。
+# 3100 的 Character::getResultsOffset / getCenterScreenOffset 按角色 ID
+# 分档（下方代码完整保留）；本模拟器统一关闭分档，避免未知新角色错位。
+USE_DEFAULT_OFFSET = True
 
 
 def visible_delta(height: float) -> float:
@@ -42,6 +52,10 @@ def get_results_offset(char_id: int, is_partner: bool, width: float, height: flo
     （结算界面显示的是玩家选中的角色，通常是 is_partner=True）。
     返回 (x, y) 设计单位偏移。
     """
+    if USE_DEFAULT_OFFSET:
+        # 3100 的 default 分支：偏移 (0, 0)。社区预览对所有角色统一走这里。
+        return (0.0, 0.0)
+
     v8 = visible_delta(height)
     x, y = 0.0, 0.0
     h720_w1280 = (height == 720.0 and width > 1280.0)
@@ -96,6 +110,10 @@ def get_center_screen_offset(char_id: int, is_partner: bool, width: float, heigh
     即「搭档位」角色很多档位的 x 偏移会被压成 0。
     返回 (x, y) 设计单位偏移。
     """
+    if USE_DEFAULT_OFFSET:
+        # 3100 的 default 分支：偏移 (0, 0)。社区预览对所有角色统一走这里。
+        return (0.0, 0.0)
+
     v8 = visible_delta(height)
     p = is_partner
     h720_w1280 = (height == 720.0 and width > 1280.0)

@@ -1,0 +1,1131 @@
+{
+ "name": "Layer",
+ "ctype": "GameNodeObjectData",
+ "type": "Layer",
+ "action_tag": 0,
+ "visible": true,
+ "alpha": 255.0,
+ "rotation": [
+  0.0,
+  0.0
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "anchor": [
+  0.0,
+  0.0
+ ],
+ "scale": [
+  1.0,
+  1.0
+ ],
+ "size": [
+  1280.0,
+  300.0
+ ],
+ "color": [
+  255,
+  255,
+  255,
+  255
+ ],
+ "flip": [
+  false,
+  false
+ ],
+ "touch_enable": false,
+ "children": [
+  {
+   "name": "bg",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": 811011851,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    640.469971,
+    300.5
+   ],
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    1561.0,
+    69.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/topbar/top_bar_bg.png"
+  },
+  {
+   "name": "titleLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -740231023,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    18.437901,
+    272.98999
+   ],
+   "anchor": [
+    0.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    117.0,
+    38.0
+   ],
+   "color": [
+    53,
+    24,
+    39,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 24.0,
+   "text": "Arcaea 1.0",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "fragmentsLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1849949729,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    925.53833,
+    272.999908
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    103.0,
+    32.0
+   ],
+   "color": [
+    34,
+    34,
+    34,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "Fragments",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "fragmentsButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -324418301,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    987.26001,
+    300.0
+   ],
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "scale": [
+    0.667,
+    0.667
+   ],
+   "size": [
+    147.0,
+    74.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/topbar/top_button.png",
+   "pressed_file": "layouts/1080/topbar/top_button_pressed.png",
+   "disabled_file": "layouts/1080/topbar/top_button_max.png",
+   "text_color": [
+    255,
+    255,
+    255,
+    255
+   ]
+  },
+  {
+   "name": "fragmentStacks",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -1778263086,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    987.0,
+    262.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.667,
+    0.667
+   ],
+   "size": [
+    147.0,
+    44.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/topbar/fragstack-single.png",
+   "pressed_file": "layouts/1080/topbar/fragstack-single.png",
+   "disabled_file": "layouts/1080/topbar/fragstack-singleplus.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "memoriesLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 1247454266,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1151.197388,
+    272.999908
+   ],
+   "anchor": [
+    1.0,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    94.0,
+    32.0
+   ],
+   "color": [
+    34,
+    34,
+    34,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "Memories",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Regular.ttf",
+   "outline_enabled": true,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "memoriesButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": 1260512851,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1215.93396,
+    300.0
+   ],
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "scale": [
+    0.667,
+    0.667
+   ],
+   "size": [
+    147.0,
+    74.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/topbar/top_button_special.png",
+   "pressed_file": "layouts/1080/topbar/top_button_special_pressed.png",
+   "disabled_file": "layouts/1080/topbar/top_button_special_pressed.png",
+   "text_color": [
+    65,
+    65,
+    70,
+    255
+   ]
+  },
+  {
+   "name": "fragmentsCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1454756767,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    986.230408,
+    272.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    27.0,
+    27.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "20",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-SemiBold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "memoriesCountLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -272635962,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1215.922119,
+    272.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    27.0,
+    27.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "20",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-SemiBold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "settingsButton",
+   "ctype": "ButtonObjectData",
+   "type": "Button",
+   "action_tag": -2124552337,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    762.905884,
+    300.0
+   ],
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    98.0,
+    50.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": true,
+   "children": [],
+   "normal_file": "layouts/1080/topbar/top_button_settings.png",
+   "pressed_file": "layouts/1080/topbar/top_button_pressed.png",
+   "disabled_file": "Default/Button_Disable.png",
+   "text_color": [
+    255,
+    255,
+    255,
+    255
+   ]
+  },
+  {
+   "name": "statusBg",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": -1861944314,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    523.787781,
+    273.7258
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    0.55,
+    0.6
+   ],
+   "size": [
+    232.0,
+    28.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/topbar/status_bg.png"
+  },
+  {
+   "name": "statusLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 2108503540,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    524.671997,
+    273.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    92.0,
+    37.0
+   ],
+   "color": [
+    102,
+    102,
+    102,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 22.0,
+   "text": "OFFLINE",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 2.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "fragmentsCountLabel_change",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -564414420,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    986.229309,
+    272.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    27.0,
+    27.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "20",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-SemiBold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "memoriesCountLabel_change",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": 2023477451,
+   "visible": false,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    1215.921997,
+    272.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    27.0,
+    27.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 20.0,
+   "text": "20",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/Exo-SemiBold.ttf",
+   "outline_enabled": false,
+   "outline_size": 1.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "settingsImage",
+   "ctype": "SpriteObjectData",
+   "type": "Sprite",
+   "action_tag": 591931459,
+   "visible": true,
+   "alpha": 99.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    761.665405,
+    272.0
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    31.0,
+    31.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "file": "layouts/topbar/settings.png"
+  },
+  {
+   "name": "settingsLabel",
+   "ctype": "TextObjectData",
+   "type": "Text",
+   "action_tag": -1720024369,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    762.845093,
+    270.955414
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    37.0,
+    28.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [],
+   "font_size": 16.0,
+   "text": "設定",
+   "halign": "",
+   "valign": "",
+   "font": "Fonts/L2-Semibold.ttf",
+   "outline_enabled": true,
+   "outline_size": 2.0,
+   "shadow_enabled": false,
+   "shadow_offset": [
+    2.0,
+    -2.0
+   ],
+   "outline_color": [
+    64,
+    45,
+    63,
+    255
+   ],
+   "shadow_color": [
+    110,
+    110,
+    110,
+    255
+   ]
+  },
+  {
+   "name": "leftButtonContainer",
+   "ctype": "SingleNodeObjectData",
+   "type": "Node",
+   "action_tag": -1018720762,
+   "visible": true,
+   "alpha": 255.0,
+   "rotation": [
+    0.0,
+    0.0
+   ],
+   "position": [
+    -80.0,
+    300.0
+   ],
+   "anchor": [
+    0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "color": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "flip": [
+    false,
+    false
+   ],
+   "touch_enable": false,
+   "children": [
+    {
+     "name": "leftButton",
+     "ctype": "ButtonObjectData",
+     "type": "Button",
+     "action_tag": 722503211,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      293.0,
+      0.0
+     ],
+     "anchor": [
+      0.5,
+      1.0
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      98.0,
+      50.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": true,
+     "children": [],
+     "normal_file": "layouts/1080/topbar/top_button_settings.png",
+     "pressed_file": "layouts/1080/topbar/top_button_disable_solid.png",
+     "disabled_file": "layouts/1080/topbar/top_button_disable_solid.png",
+     "text_color": [
+      255,
+      255,
+      255,
+      255
+     ]
+    },
+    {
+     "name": "leftButtonImage",
+     "ctype": "SpriteObjectData",
+     "type": "Sprite",
+     "action_tag": 569070403,
+     "visible": true,
+     "alpha": 127.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      293.0,
+      -28.93
+     ],
+     "anchor": [
+      0.55,
+      0.4148
+     ],
+     "scale": [
+      0.6818,
+      0.7209
+     ],
+     "size": [
+      64.0,
+      64.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "file": "layouts/topbar/cloud_sync.png"
+    },
+    {
+     "name": "leftButtonLabel",
+     "ctype": "TextObjectData",
+     "type": "Text",
+     "action_tag": -299427809,
+     "visible": true,
+     "alpha": 255.0,
+     "rotation": [
+      0.0,
+      0.0
+     ],
+     "position": [
+      293.0,
+      -29.0446
+     ],
+     "anchor": [
+      0.5,
+      0.5
+     ],
+     "scale": [
+      1.0,
+      1.0
+     ],
+     "size": [
+      36.0,
+      28.0
+     ],
+     "color": [
+      255,
+      255,
+      255,
+      255
+     ],
+     "flip": [
+      false,
+      false
+     ],
+     "touch_enable": false,
+     "children": [],
+     "font_size": 16.0,
+     "text": "同期",
+     "halign": "",
+     "valign": "",
+     "font": "Fonts/L2-Semibold.ttf",
+     "outline_enabled": true,
+     "outline_size": 2.0,
+     "shadow_enabled": false,
+     "shadow_offset": [
+      2.0,
+      -2.0
+     ],
+     "outline_color": [
+      64,
+      45,
+      63,
+      255
+     ],
+     "shadow_color": [
+      110,
+      110,
+      110,
+      255
+     ]
+    }
+   ]
+  }
+ ]
+}
